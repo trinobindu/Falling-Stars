@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.trinobindu.fallingstars",
+      "sha256_cert_fingerprints": [
+        "13:94:3D:41:36:89:77:B7:8C:6C:31:93:EB:49:93:A4:AD:BC:67:63:E4:18:50:3D:96:C6:26:D4:11:61:E9:F1"
+      ]
+    }
+  }
+]
