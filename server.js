@@ -16,7 +16,8 @@ const API_ROUTES = {
   '/api/signups': require('./api/signups.js'),
   '/api/auth/signup': require('./api/auth/signup.js'),
   '/api/auth/login': require('./api/auth/login.js'),
-  '/api/player/change-ign': require('./api/player/change-ign.js')
+  '/api/player/change-ign': require('./api/player/change-ign.js'),
+  '/api/sync': require('./api/sync.js')
 };
 
 // MIME types for static assets
@@ -106,3 +107,49 @@ const server = http.createServer((req, res) => {
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Catch the Stars server running at http://localhost:${PORT}/`);
 });
+
+// Auto-sync player files from Vercel Cloud into local folder every 30s
+function autoSyncFromCloud() {
+  const https = require('https');
+  const syncDataDir = path.join(__dirname, 'data');
+  const syncPlayersDir = path.join(syncDataDir, 'players');
+
+  https.get('https://falling-stars-mu.vercel.app/api/sync', (res) => {
+    let raw = '';
+    res.on('data', c => raw += c);
+    res.on('end', () => {
+      try {
+        const data = JSON.parse(raw);
+        if (data && data.success && Array.isArray(data.rawPlayers)) {
+          if (!fs.existsSync(syncDataDir)) fs.mkdirSync(syncDataDir, { recursive: true });
+          if (!fs.existsSync(syncPlayersDir)) fs.mkdirSync(syncPlayersDir, { recursive: true });
+
+          data.rawPlayers.forEach((p) => {
+            const sanitized = p.email.toLowerCase().replace(/[^a-z0-9]/g, '_');
+            const filePath = path.join(syncPlayersDir, `${sanitized}.json`);
+            fs.writeFileSync(filePath, JSON.stringify(p, null, 2), 'utf8');
+          });
+
+          const signupsSummary = {
+            totalSignups: data.rawPlayers.length,
+            lastUpdated: new Date().toISOString(),
+            players: data.rawPlayers.map(p => ({
+              id: p.id,
+              email: p.email,
+              ign: p.ign,
+              signupDate: p.signupDate,
+              highestScore: p.highestScore || 0,
+              timeSurvived: p.timeSurvived || '0:00',
+              gamesPlayed: p.gamesPlayed || 0,
+              lastLogin: p.lastLogin || p.signupDate
+            }))
+          };
+          fs.writeFileSync(path.join(syncDataDir, 'signups.json'), JSON.stringify(signupsSummary, null, 2), 'utf8');
+        }
+      } catch (e) {}
+    });
+  }).on('error', () => {});
+}
+
+autoSyncFromCloud();
+setInterval(autoSyncFromCloud, 30000);

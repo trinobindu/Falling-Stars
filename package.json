@@ -3,11 +3,15 @@
   "version": "1.0.0",
   "description": "Endless Cosmic Survival game with real-player leaderboard and password authentication",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "sync": "node sync-players.js"
   },
   "engines": {
     "node": ">=18.0.0"
   },
   "author": "TRINOBINDU DAS",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/blob": "^2.8.0"
+  }
 }

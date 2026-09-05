@@ -1,5 +1,4 @@
-const { getStorageDirs, loadAllPlayers, getPlayerFilePath, updateSignupsIndex, sendJson, parseBody, handleCors } = require('./_lib/storage');
-const fs = require('fs');
+const { getPlayerByEmail, loadAllPlayers, savePlayer, sendJson, parseBody, handleCors } = require('./_lib/storage');
 
 module.exports = async function handler(req, res) {
   if (handleCors(req, res)) return;
@@ -22,14 +21,12 @@ module.exports = async function handler(req, res) {
     return sendJson(res, 400, { error: 'Email is required to record score.' });
   }
 
-  const { dataDir, playersDir } = getStorageDirs();
-  const filePath = getPlayerFilePath(email, playersDir);
-  if (!fs.existsSync(filePath)) {
-    return sendJson(res, 404, { error: 'Player account not found.' });
-  }
-
   try {
-    const player = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    const player = await getPlayerByEmail(email);
+    if (!player) {
+      return sendJson(res, 404, { error: 'Player account not found.' });
+    }
+
     player.gamesPlayed = (player.gamesPlayed || 0) + 1;
     player.lastActive = new Date().toISOString();
 
@@ -40,10 +37,9 @@ module.exports = async function handler(req, res) {
       isNewHigh = true;
     }
 
-    fs.writeFileSync(filePath, JSON.stringify(player, null, 2), 'utf8');
-    updateSignupsIndex(dataDir, playersDir);
+    await savePlayer(player);
 
-    const all = loadAllPlayers(playersDir).sort((a, b) => (b.highestScore || 0) - (a.highestScore || 0));
+    const all = (await loadAllPlayers()).sort((a, b) => (b.highestScore || 0) - (a.highestScore || 0));
     const rankIndex = all.findIndex((p) => p.email.toLowerCase() === email);
     const rank = rankIndex >= 0 ? rankIndex + 1 : '-';
 
@@ -56,6 +52,7 @@ module.exports = async function handler(req, res) {
       isNewHigh
     });
   } catch (saveErr) {
+    console.error('Save score error:', saveErr);
     return sendJson(res, 500, { error: 'Server error saving score.' });
   }
 };

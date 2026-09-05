@@ -1,16 +1,16 @@
 {
-  "totalSignups": 3,
-  "lastUpdated": "2026-09-05T14:55:04.548Z",
+  "totalSignups": 4,
+  "lastUpdated": "2026-09-05T17:15:44.108Z",
   "players": [
     {
-      "id": "usr_1788618599477_di185",
-      "email": "td5298@gmail.com",
-      "ign": "Trino",
-      "signupDate": "2026-09-05T14:29:59.477Z",
-      "highestScore": 5,
-      "timeSurvived": "0:10",
-      "gamesPlayed": 1,
-      "lastLogin": "2026-09-05T14:45:50.566Z"
+      "id": "usr_1788626307212_kk989",
+      "email": "rith98961@gmail.com",
+      "ign": "k. k",
+      "signupDate": "2026-09-05T16:38:27.212Z",
+      "highestScore": 54,
+      "timeSurvived": "0:26",
+      "gamesPlayed": 2,
+      "lastLogin": "2026-09-05T16:40:00.000Z"
     },
     {
       "id": "usr_1788616918113_13k4n",
@@ -31,6 +31,16 @@
       "timeSurvived": "0:13",
       "gamesPlayed": 1,
       "lastLogin": "2026-09-05T14:42:46.845Z"
+    },
+    {
+      "id": "usr_1788618599477_di185",
+      "email": "td5298@gmail.com",
+      "ign": "Trino",
+      "signupDate": "2026-09-05T14:29:59.477Z",
+      "highestScore": 5,
+      "timeSurvived": "0:10",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-05T14:45:50.566Z"
     }
   ]
 }

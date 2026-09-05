@@ -1,5 +1,4 @@
-const { getStorageDirs, getPlayerFilePath, updateSignupsIndex, verifyPassword, sendJson, parseBody, handleCors } = require('../_lib/storage');
-const fs = require('fs');
+const { getPlayerByEmail, savePlayer, verifyPassword, sendJson, parseBody, handleCors } = require('../_lib/storage');
 
 module.exports = async function handler(req, res) {
   if (handleCors(req, res)) return;
@@ -21,42 +20,36 @@ module.exports = async function handler(req, res) {
     return sendJson(res, 400, { error: 'Please enter both your Gmail and password.' });
   }
 
-  const { dataDir, playersDir } = getStorageDirs();
-  const filePath = getPlayerFilePath(email, playersDir);
-  if (!fs.existsSync(filePath)) {
-    return sendJson(res, 404, {
-      error: 'No account found with this Gmail. Please sign up to create your account!'
-    });
-  }
-
-  let player;
   try {
-    player = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-  } catch (readErr) {
-    return sendJson(res, 500, { error: 'Failed to read account data.' });
-  }
-
-  const isMatch = verifyPassword(password, player.hash, player.salt);
-  if (!isMatch) {
-    return sendJson(res, 401, { error: 'Incorrect password. Please check your password and try again.' });
-  }
-
-  player.lastLogin = new Date().toISOString();
-  try {
-    fs.writeFileSync(filePath, JSON.stringify(player, null, 2), 'utf8');
-    updateSignupsIndex(dataDir, playersDir);
-  } catch (updateErr) {}
-
-  return sendJson(res, 200, {
-    success: true,
-    message: 'Welcome back, ' + player.ign + '!',
-    user: {
-      id: player.id,
-      email: player.email,
-      ign: player.ign,
-      highestScore: player.highestScore || 0,
-      timeSurvived: player.timeSurvived || '0:00',
-      gamesPlayed: player.gamesPlayed || 0
+    const player = await getPlayerByEmail(email);
+    if (!player) {
+      return sendJson(res, 404, {
+        error: 'No account found with this Gmail. Please sign up to create your account!'
+      });
     }
-  });
+
+    const isMatch = verifyPassword(password, player.hash, player.salt);
+    if (!isMatch) {
+      return sendJson(res, 401, { error: 'Incorrect password. Please check your password and try again.' });
+    }
+
+    player.lastLogin = new Date().toISOString();
+    await savePlayer(player);
+
+    return sendJson(res, 200, {
+      success: true,
+      message: 'Welcome back, ' + player.ign + '!',
+      user: {
+        id: player.id,
+        email: player.email,
+        ign: player.ign,
+        highestScore: player.highestScore || 0,
+        timeSurvived: player.timeSurvived || '0:00',
+        gamesPlayed: player.gamesPlayed || 0
+      }
+    });
+  } catch (err) {
+    console.error('Login error:', err);
+    return sendJson(res, 500, { error: 'Failed to authenticate user.' });
+  }
 };

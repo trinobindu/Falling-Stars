@@ -1,5 +1,4 @@
-const { getStorageDirs, loadAllPlayers, getPlayerFilePath, updateSignupsIndex, hashPassword, sendJson, parseBody, handleCors } = require('../_lib/storage');
-const fs = require('fs');
+const { loadAllPlayers, savePlayer, hashPassword, sendJson, parseBody, handleCors } = require('../_lib/storage');
 
 module.exports = async function handler(req, res) {
   if (handleCors(req, res)) return;
@@ -28,39 +27,38 @@ module.exports = async function handler(req, res) {
     return sendJson(res, 400, { error: 'In-Game Name (IGN) must be between 2 and 16 characters.' });
   }
 
-  const { dataDir, playersDir } = getStorageDirs();
-  const filePath = getPlayerFilePath(email, playersDir);
-  if (fs.existsSync(filePath)) {
-    return sendJson(res, 409, {
-      error: 'An account with this Gmail already exists. Please log in with your password instead!'
-    });
-  }
-
-  const existingPlayers = loadAllPlayers(playersDir);
-  const ignTaken = existingPlayers.some((p) => p.ign.toLowerCase() === ign.toLowerCase());
-  if (ignTaken) {
-    return sendJson(res, 409, {
-      error: 'The In-Game Name "' + ign + '" is already taken. Please choose a unique name!'
-    });
-  }
-
-  const { salt, hash } = hashPassword(password);
-  const newPlayer = {
-    id: 'usr_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
-    email,
-    ign,
-    salt,
-    hash,
-    signupDate: new Date().toISOString(),
-    lastLogin: new Date().toISOString(),
-    highestScore: 0,
-    timeSurvived: '0:00',
-    gamesPlayed: 0
-  };
-
   try {
-    fs.writeFileSync(filePath, JSON.stringify(newPlayer, null, 2), 'utf8');
-    updateSignupsIndex(dataDir, playersDir);
+    const players = await loadAllPlayers();
+
+    const existingEmail = players.find(p => p.email && p.email.toLowerCase() === email);
+    if (existingEmail) {
+      return sendJson(res, 409, {
+        error: 'An account with this Gmail already exists. Please log in with your password instead!'
+      });
+    }
+
+    const ignTaken = players.some(p => p.ign && p.ign.toLowerCase() === ign.toLowerCase());
+    if (ignTaken) {
+      return sendJson(res, 409, {
+        error: 'The In-Game Name "' + ign + '" is already taken. Please choose a unique name!'
+      });
+    }
+
+    const { salt, hash } = hashPassword(password);
+    const newPlayer = {
+      id: 'usr_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+      email,
+      ign,
+      salt,
+      hash,
+      signupDate: new Date().toISOString(),
+      lastLogin: new Date().toISOString(),
+      highestScore: 0,
+      timeSurvived: '0:00',
+      gamesPlayed: 0
+    };
+
+    await savePlayer(newPlayer);
 
     return sendJson(res, 201, {
       success: true,
@@ -75,7 +73,7 @@ module.exports = async function handler(req, res) {
       }
     });
   } catch (saveErr) {
-    console.error('Error saving new player file:', saveErr);
+    console.error('Error saving new player:', saveErr);
     return sendJson(res, 500, { error: 'Server error saving account data.' });
   }
 };
