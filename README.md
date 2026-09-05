@@ -1,46 +1,50 @@
-# ⭐ Catch the Stars - Browser Arcade Game
+# ⭐ Catch the Stars - Full-Stack Browser Arcade Game
 
-A complete, polished, modern responsive web game where players catch falling stars in an **Endless Cosmic Survival** mode with **Gmail / Google Account Login** support.
+A fast-paced, cosmic arcade game where players catch falling stars in an **Endless Cosmic Survival** mode with real-time user accounts, secure authentication, customizable In-Game Names (IGNs), and a global real-player leaderboard.
 
-![Catch the Stars](assets/star.svg)
-
----
-
-## 🎮 Game Concept & Rules
-
-- **Endless Survival Mode**: **No time limit!** Play and rack up points for as long as you can stay alive.
-- **Goal**: Click or tap falling stars before they reach the bottom of the game board.
-- **Misses Allowed**: You have **5 misses**. If 5 stars escape past the bottom, the game ends.
-- **Time Survived**: A live stopwatch tracks how many minutes and seconds you survive.
-- **Dynamic Difficulty**: As your score climbs, stars fall progressively faster and spawn more frequently!
+🌐 **Live Vercel Demo**: [https://falling-stars-mu.vercel.app/](https://falling-stars-mu.vercel.app/)  
+📦 **GitHub Repository**: [https://github.com/trinobindu/Falling-Stars](https://github.com/trinobindu/Falling-Stars)
 
 ---
 
-## 👤 Gmail / Google Sign-In
+## 🎮 Game Concept & Mechanics
 
-- **Personalized High Scores**: Sign in with your Gmail to record and track your individual personal best score.
-- **Instant Profile**: Shows your Google initial avatar, display name, and email in the top header.
-- **One-Click Sign-In**: Enter your Gmail address or click one of the quick test accounts for instant instant local sign-in.
-- **Official Google OAuth Ready**: Integrated with the official Google Identity Services (GIS) SDK (`@accounts.google.com/gsi/client`). Add your Google Cloud Client ID to `CONFIG.GOOGLE_CLIENT_ID` anytime for full OAuth verification.
-- **Sign Out Anytime**: Easily log out to play in Guest mode or switch between accounts.
+- **Endless Survival Mode**: No time limit! Catch as many falling stars as you can.
+- **Heart & Miss System**: You have **5 misses**. If 5 stars slip past the bottom boundary, the game ends.
+- **Live Stopwatch**: Real-time timer tracking your survival endurance in minutes and seconds.
+- **Dynamic Difficulty**: As your score increases, star fall speed accelerates and spawn intervals shorten.
+- **Star Types & Points**:
+  - ⭐ **Normal Star** (+1 pt) - Standard speed, warm golden glow (70% spawn chance)
+  - 🌟 **Golden Star** (+3 pts) - Faster speed, brilliant amber sparkle (20% spawn chance)
+  - 💫 **Supernova Star** (+5 pts) - Ultra-fast, spinning iridescent cosmic gradient (10% spawn chance)
 
 ---
 
-## 🌟 Star Types & Points
+## 🔐 Real-Player Authentication & Features
 
-| Star Type | Icon | Points | Spawn Chance | Characteristics |
-| :--- | :---: | :---: | :---: | :--- |
-| **Normal Star** | ⭐ | **+1 pt** | 70% | Standard speed, warm golden glow |
-| **Golden Star** | 🌟 | **+3 pts** | 20% | Faster speed, brilliant amber sparkle |
-| **Supernova Star** | 💫 | **+5 pts** | 10% | Very fast, spinning iridescent cosmic gradient |
+1. **Email & Password Authentication**:
+   - Clean signup with Gmail / email and secure password.
+   - Credentials securely stored and validated with SHA-256 password hashing.
+   - Returning players can sign in anytime and resume their high score tracking.
+2. **In-Game Name (IGN) System**:
+   - Every registered player sets an in-game name upon registration.
+   - **Change Name Option**: Players can update their in-game name anytime from their profile with live uniqueness checking.
+3. **Real-Player Global Leaderboard**:
+   - Shows top players ranked by verified high score and time survived.
+   - **Zero Bot Players**: Only real registered players appear on the leaderboard.
+   - Displays real In-Game Names (IGNs), ranks, scores, and survival times.
+4. **Clean Gated Interface**:
+   - Game HUD, scores, best score, and play controls are cleanly hidden until authenticated, providing an uncluttered login experience.
+5. **Real-Time Web Audio Synthesizer**:
+   - Audio effects (star chimes, supernova chords, miss thud, game over fanfare) synthesized on-the-fly with the browser's Web Audio API—no external audio files or latency!
 
 ---
 
 ## 🕹️ Controls
 
-- **Mouse / Touch**: Click or tap stars to catch them.
+- **Mouse / Touch**: Click or tap falling stars before they reach the bottom.
 - **Keyboard Shortcuts**:
-  - <kbd>Space</kbd> : Start game / Play again / Resume when paused
+  - <kbd>Space</kbd> : Start game / Play again / Resume
   - <kbd>P</kbd> or <kbd>Escape</kbd> : Pause / Resume
   - <kbd>M</kbd> : Toggle sound (Mute / Unmute)
 
@@ -50,41 +54,49 @@ A complete, polished, modern responsive web game where players catch falling sta
 
 ```
 Falling Stars/
-├── index.html          # Semantic HTML5 layout, HUD, overlays, and modal dialogs
-├── style.css           # Space theme styling, glassmorphism, responsive queries & keyframe animations
-├── script.js           # Clean, modular, well-commented vanilla JavaScript game engine
-├── README.md           # Documentation, rules, and run instructions
-└── assets/
-    └── star.svg        # Reusable vector star icon & favicon
+├── api/
+│   └── index.js            # Vercel Serverless entrypoint (Express API handlers)
+├── public/
+│   ├── index.html          # Clean HTML5 layout, HUD, overlays & modal dialogs
+│   ├── style.css           # Responsive space theme, glassmorphic UI, animations
+│   ├── script.js           # Vanilla JavaScript game engine & API client
+│   └── assets/
+│       └── star.svg        # Scalable vector star icon & favicon
+├── data/
+│   └── users.json          # Persistent player database (email, IGN, hash, scores)
+├── server.js               # Local development Node.js / Express server
+├── vercel.json             # Vercel serverless deployment routing configuration
+├── package.json            # Dependencies and npm start scripts
+└── README.md               # Documentation and project overview
 ```
 
 ---
 
-## 🚀 How to Run Locally
+## 🚀 Running Locally
 
-Because this project is built entirely with standard vanilla web technologies (HTML5, CSS3, and JavaScript), **no build step, installation, or backend is required!**
+### Prerequisites
+- [Node.js](https://nodejs.org/) (v16 or newer) installed.
 
-### Option 1: Direct Browser Open (Double Click)
-1. Navigate to the `Falling Stars` folder on your computer.
-2. Double-click **`index.html`** to open it directly in Chrome, Edge, Firefox, or Safari.
-
-### Option 2: Live Server (VS Code / Local HTTP)
-If you use VS Code:
-1. Open the folder in VS Code.
-2. Right-click `index.html` and choose **"Open with Live Server"**.
-
-Or using Python in terminal:
-```bash
-python -m http.server 8000
-```
-Then visit `http://localhost:8000` in your web browser.
+### Steps
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/trinobindu/Falling-Stars.git
+   cd Falling-Stars
+   ```
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+3. **Start the local server**:
+   ```bash
+   npm start
+   ```
+4. **Open in browser**:
+   Visit [http://localhost:8080](http://localhost:8080) to play and sign in.
 
 ---
 
-## 🔊 Sound Synthesis (Web Audio API)
+## ☁️ Deployment
 
-All sound effects (normal star chime, golden chime, supernova chord, miss thud, game over fanfare) are **synthesized in real-time** via the browser's built-in **Web Audio API**.
-- Zero external MP3/WAV files required.
-- Zero network latency.
-- Completely offline capable.
-- Audio preference (Sound On / Off) is saved automatically in `localStorage`.
+- **Production URL**: [https://falling-stars-mu.vercel.app/](https://falling-stars-mu.vercel.app/)
+- Configured with `vercel.json` to route `/api/*` calls to Vercel Serverless Functions while serving frontend assets statically from `public/`.
