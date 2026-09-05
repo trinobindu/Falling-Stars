@@ -1,14 +1,23 @@
 /**
  * Catch the Stars - Local HTTP Server & Static File Host
- * Delegates /api/* requests to ./api/index.js for 100% parity with Vercel serverless.
+ * Routes API endpoints to dedicated handlers in ./api/ with 100% parity to Vercel.
  */
 
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
-const apiHandler = require('./api/index.js');
 
 const PORT = process.env.PORT || 8080;
+
+// Route dispatch map
+const API_ROUTES = {
+  '/api/leaderboard': require('./api/leaderboard.js'),
+  '/api/score': require('./api/score.js'),
+  '/api/signups': require('./api/signups.js'),
+  '/api/auth/signup': require('./api/auth/signup.js'),
+  '/api/auth/login': require('./api/auth/login.js'),
+  '/api/player/change-ign': require('./api/player/change-ign.js')
+};
 
 // MIME types for static assets
 const MIME_TYPES = {
@@ -23,11 +32,11 @@ const MIME_TYPES = {
 
 const server = http.createServer((req, res) => {
   const urlObj = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
-  const pathname = urlObj.pathname;
+  const pathname = urlObj.pathname.replace(/\/+$/, '') || '/';
 
-  // Delegate all API requests to the serverless apiHandler
-  if (pathname.startsWith('/api/')) {
-    apiHandler(req, res);
+  // Check API route
+  if (API_ROUTES[pathname]) {
+    API_ROUTES[pathname](req, res);
     return;
   }
 
@@ -45,16 +54,20 @@ const server = http.createServer((req, res) => {
   /* ==========================================================================
      STATIC FILE SERVING (HTML, CSS, JS, Assets)
      ========================================================================== */
-  let reqPath = pathname;
+  let reqPath = urlObj.pathname;
   if (reqPath === '/' || reqPath === '') {
     reqPath = '/index.html';
   }
 
-  // Prevent directory traversal
   const safeRelPath = reqPath.replace(/^\/+/, '');
-  let filePath = path.resolve(__dirname, safeRelPath);
 
-  // Reject paths resolving outside workspace
+  // Look in public/ directory first, then root fallback
+  let filePath = path.resolve(__dirname, 'public', safeRelPath);
+  if (!fs.existsSync(filePath)) {
+    filePath = path.resolve(__dirname, safeRelPath);
+  }
+
+  // Reject paths outside workspace
   if (!filePath.startsWith(__dirname)) {
     res.writeHead(403, { 'Content-Type': 'text/plain' });
     res.end('403 Forbidden');

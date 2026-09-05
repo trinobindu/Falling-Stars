@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="Catch the Stars - A fast, addictive, and responsive browser arcade game. Catch falling stars before time runs out!">
+  <meta name="theme-color" content="#0b0e1e">
+  <title>Catch the Stars ⭐ - Casual Web Arcade Game</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="assets/star.svg" type="image/svg+xml">
+  <!-- Google Identity Services SDK for official Google Sign-In -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <!-- Ambient Cosmic Background Canvas -->
+  <canvas id="bg-canvas" aria-hidden="true"></canvas>
+
+  <!-- Reusable SVG Gradients -->
+  <svg width="0" height="0" style="position:absolute;width:0;height:0;overflow:hidden;pointer-events:none;" aria-hidden="true">
+    <defs>
+      <linearGradient id="cosmic-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#f43f5e" />
+        <stop offset="45%" stop-color="#d946ef" />
+        <stop offset="100%" stop-color="#38bdf8" />
+      </linearGradient>
+    </defs>
+  </svg>
+
+  <div class="app-container">
+    <!-- Main Header -->
+    <header class="game-header">
+      <div class="brand">
+        <h1 class="game-title">
+          <span class="title-star" aria-hidden="true">⭐</span> Catch the Stars
+        </h1>
+        <p class="game-subtitle">Endless Cosmic Survival &bull; How many can you catch?</p>
+      </div>
+
+      <!-- Header Actions: Sound, Instructions & Gmail Auth -->
+      <div class="header-actions">
+        <!-- Google Sign-In Button (Guest state) -->
+        <button id="btn-google-login" class="google-login-btn" type="button" aria-label="Sign in with Google">
+          <svg class="google-g-logo" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.29 21.36 7.37 24 12 24z"/>
+            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.16 0 9.94 0 12s.46 3.84 1.26 5.42l4.02-3.15z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.64 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+          </svg>
+          <span class="btn-google-text">Sign in with Google</span>
+        </button>
+
+        <!-- User Profile Pill (Authenticated state) -->
+        <div id="user-profile-badge" class="user-profile-badge hidden" tabindex="0" role="region" aria-label="User Account">
+          <div id="user-avatar" class="user-avatar" aria-hidden="true">G</div>
+          <div class="user-meta">
+            <span id="user-name" class="user-name">User</span>
+            <span id="user-email" class="user-email">user@gmail.com</span>
+          </div>
+          <button id="btn-header-edit-ign" class="edit-ign-mini-btn" type="button" title="Change In-Game Name" aria-label="Change In-Game Name">✏️</button>
+          <button id="btn-signout" class="signout-btn" type="button" title="Sign Out of Gmail">Sign Out</button>
+        </div>
+
+        <button id="btn-leaderboard-nav" class="icon-btn" type="button" aria-label="View Leaderboard" title="Leaderboard (L)">
+          <span aria-hidden="true">🏆</span>
+          <span class="sr-only">Leaderboard</span>
+        </button>
+        <button id="btn-sound" class="icon-btn" type="button" aria-label="Toggle Sound" title="Toggle Sound (M)">
+          <span id="sound-icon" aria-hidden="true">🔊</span>
+          <span class="sr-only">Toggle Sound</span>
+        </button>
+        <button id="btn-info" class="icon-btn" type="button" aria-label="How to play" title="Instructions">
+          <span aria-hidden="true">❓</span>
+          <span class="sr-only">How to play</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Game HUD (Heads-Up Display) - Hidden until user signs in -->
+    <section id="game-hud" class="game-hud hidden" aria-label="Game Information">
+      <div class="hud-card" id="hud-score">
+        <span class="hud-label">Score</span>
+        <span class="hud-value" id="score-display">0</span>
+      </div>
+
+      <div class="hud-card" id="hud-timer">
+        <span class="hud-label">Time Survived</span>
+        <div class="timer-wrapper">
+          <span class="hud-value" id="time-display">0:00</span>
+        </div>
+        <div class="timer-bar-container" aria-hidden="true">
+          <div class="timer-bar endless-pulse" id="timer-progress"></div>
+        </div>
+      </div>
+
+      <div class="hud-card" id="hud-misses">
+        <div class="hud-label-row">
+          <span class="hud-label">Missed</span>
+          <span class="hud-subvalue" id="miss-fraction">0 / 5</span>
+        </div>
+        <div class="miss-dots" id="miss-indicators" aria-hidden="true">
+          <span class="miss-dot" data-index="1"></span>
+          <span class="miss-dot" data-index="2"></span>
+          <span class="miss-dot" data-index="3"></span>
+          <span class="miss-dot" data-index="4"></span>
+          <span class="miss-dot" data-index="5"></span>
+        </div>
+      </div>
+
+      <div class="hud-card" id="hud-best">
+        <span class="hud-label">Best Score</span>
+        <span class="hud-value best-score-value" id="best-display">0</span>
+      </div>
+    </section>
+
+    <!-- Main Game Board -->
+    <main class="game-wrapper">
+      <div id="game-area" class="game-area" tabindex="0" role="region" aria-label="Game board with falling stars">
+        <!-- Container for all dynamically generated falling stars -->
+        <div id="star-layer" class="star-layer" aria-live="polite"></div>
+
+        <!-- Layer for floating +1, +3, +5 score popups and sparks -->
+        <div id="fx-layer" class="fx-layer" aria-hidden="true"></div>
+
+        <!-- In-game Pause Button -->
+        <button id="btn-pause" class="pause-toggle-btn" type="button" aria-label="Pause game" title="Pause Game (P)">
+          <span id="pause-icon" aria-hidden="true">⏸</span>
+          <span id="pause-label" class="pause-text">Pause</span>
+        </button>
+
+        <!-- START SCREEN OVERLAY -->
+        <div id="overlay-start" class="overlay active" role="dialog" aria-modal="true" aria-labelledby="start-title">
+          <div class="overlay-card start-card-adaptive">
+            <div class="hero-star" aria-hidden="true">⭐</div>
+            <h2 id="start-title" class="overlay-title">Catch the Stars</h2>
+            <p id="start-desc" class="overlay-text">
+              Sign in or create an account to enter the arena and play.
+            </p>
+
+            <!-- MANDATORY LOGIN GATE (Sign Up & Log In with Password) -->
+            <div id="start-gate-login" class="gate-login-section">
+              <div class="auth-tabs" role="tablist">
+                <button type="button" id="tab-btn-signup" class="auth-tab active" role="tab" aria-selected="true">
+                  <span>Sign Up (New)</span>
+                </button>
+                <button type="button" id="tab-btn-login" class="auth-tab" role="tab" aria-selected="false">
+                  <span>Log In (Returning)</span>
+                </button>
+              </div>
+
+              <!-- Inline Alert Notification -->
+              <div id="auth-alert" class="auth-alert hidden" role="alert"></div>
+
+              <!-- FORM 1: SIGN UP (Gmail + IGN + Password) -->
+              <form id="form-signup" class="gate-form" onsubmit="return false;">
+                <div class="form-field">
+                  <label for="signup-gmail" class="field-label">Gmail Address:</label>
+                  <input type="email" id="signup-gmail" class="auth-input" placeholder="player@gmail.com" required autocomplete="email">
+                </div>
+                <div class="form-field">
+                  <label for="signup-ign" class="field-label">Choose In-Game Name (IGN):</label>
+                  <input type="text" id="signup-ign" class="auth-input" placeholder="e.g. StarLord (2-16 chars)" maxlength="16" minlength="2" required autocomplete="username">
+                </div>
+                <div class="form-field">
+                  <label for="signup-password" class="field-label">Create Password:</label>
+                  <div class="pwd-input-wrap">
+                    <input type="password" id="signup-password" class="auth-input pwd-input" placeholder="Min 4 characters" minlength="4" required autocomplete="new-password">
+                    <button type="button" id="btn-toggle-signup-pwd" class="pwd-toggle-btn" title="Show/Hide Password" aria-label="Toggle password visibility">👁️</button>
+                  </div>
+                </div>
+                <button type="submit" id="btn-signup-submit" class="btn btn-primary w-full">
+                  <span>Create Account &amp; Play</span>
+                  <span aria-hidden="true">🚀</span>
+                </button>
+              </form>
+
+              <!-- FORM 2: LOG IN (Gmail + Password) -->
+              <form id="form-login" class="gate-form hidden" onsubmit="return false;">
+                <div class="form-field">
+                  <label for="login-gmail" class="field-label">Gmail Address:</label>
+                  <input type="email" id="login-gmail" class="auth-input" placeholder="player@gmail.com" required autocomplete="email">
+                </div>
+                <div class="form-field">
+                  <label for="login-password" class="field-label">Password:</label>
+                  <div class="pwd-input-wrap">
+                    <input type="password" id="login-password" class="auth-input pwd-input" placeholder="Enter your password" required autocomplete="current-password">
+                    <button type="button" id="btn-toggle-login-pwd" class="pwd-toggle-btn" title="Show/Hide Password" aria-label="Toggle password visibility">👁️</button>
+                  </div>
+                </div>
+                <button type="submit" id="btn-login-submit" class="btn btn-primary w-full">
+                  <span>Log In &amp; Continue Game</span>
+                  <span aria-hidden="true">🔑</span>
+                </button>
+              </form>
+
+              <div class="gate-leaderboard-wrap" style="margin-top: 10px; width: 100%; text-align: center;">
+                <button type="button" id="btn-gate-leaderboard" class="btn-text-switch" style="color: #facc15; font-weight: 600; font-size: 0.8rem; text-decoration: none; display: inline-flex; align-items: center; gap: 5px;">
+                  <span>🏆 View Galactic Leaderboard</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- PLAYER READY CARD (Shown when player IS logged in) -->
+            <div id="start-player-ready" class="player-ready-section hidden">
+              <div class="player-profile-box">
+                <div id="ready-avatar" class="ready-avatar">G</div>
+                <div class="ready-info">
+                  <div class="ready-welcome-line">
+                    <div class="ready-welcome">Welcome, <strong id="ready-ign">Player</strong>!</div>
+                    <button id="btn-open-change-ign" class="btn-change-ign-pill" type="button" title="Change your In-Game Name">
+                      <span aria-hidden="true">✏️</span> Change Name
+                    </button>
+                  </div>
+                  <div id="ready-email" class="ready-email">player@gmail.com</div>
+                </div>
+                <div class="ready-stats-mini">
+                  <div class="ready-stat"><span class="stat-lbl">Best Score:</span> <strong id="ready-best">0</strong></div>
+                  <div class="ready-stat"><span class="stat-lbl">Rank:</span> <strong id="ready-rank" class="rank-highlight">#--</strong></div>
+                </div>
+              </div>
+
+              <div class="btn-group">
+                <button id="btn-start" class="btn btn-primary" type="button">
+                  <span>Start Game</span>
+                  <svg class="btn-arrow" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                    <path fill="currentColor" d="M8 5v14l11-7z"/>
+                  </svg>
+                </button>
+                <button id="btn-start-leaderboard" class="btn btn-secondary" type="button">
+                  <span>🏆 Leaderboard</span>
+                </button>
+              </div>
+              <div class="star-preview-row" aria-hidden="true">
+                <div class="preview-item">
+                  <span class="preview-star star-normal">⭐</span>
+                  <span class="preview-pts">+1 pt</span>
+                </div>
+                <div class="preview-item">
+                  <span class="preview-star star-golden">🌟</span>
+                  <span class="preview-pts">+3 pts</span>
+                </div>
+                <div class="preview-item">
+                  <span class="preview-star star-supernova">💫</span>
+                  <span class="preview-pts">+5 pts</span>
+                </div>
+              </div>
+              <button id="btn-switch-player" class="btn-text-switch" type="button">Switch Player / Log Out</button>
+              <p class="shortcut-tip"><kbd>Space</kbd> or tap to begin</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAUSE SCREEN OVERLAY -->
+        <div id="overlay-pause" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+          <div class="overlay-card">
+            <div class="pause-symbol" aria-hidden="true">⏸</div>
+            <h2 id="pause-title" class="overlay-title">Game Paused</h2>
+            <p class="overlay-text">Take a breath, the cosmos is waiting for you.</p>
+
+            <div class="btn-group">
+              <button id="btn-resume" class="btn btn-primary" type="button">
+                <span>Resume</span>
+              </button>
+              <button id="btn-pause-restart" class="btn btn-secondary" type="button">
+                <span>Restart</span>
+              </button>
+            </div>
+            <p class="shortcut-tip">Press <kbd>P</kbd> to resume</p>
+          </div>
+        </div>
+
+        <!-- GAME OVER OVERLAY -->
+        <div id="overlay-gameover" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="gameover-title">
+          <div class="overlay-card gameover-card">
+            <div id="gameover-badge" class="result-badge" aria-hidden="true">🏁</div>
+            <h2 id="gameover-title" class="overlay-title">Game Over!</h2>
+            <p id="gameover-reason" class="gameover-reason">5 stars escaped past the boundary!</p>
+
+            <div class="score-summary">
+              <div class="summary-item main-score">
+                <span class="summary-label">Your Score</span>
+                <span class="summary-value" id="final-score">0</span>
+              </div>
+
+              <div id="new-high-banner" class="new-high-banner hidden">
+                ✨ New Best Score! ✨
+              </div>
+
+              <div id="go-rank-banner" class="go-rank-banner">
+                🏆 Leaderboard Rank: <strong id="final-rank">#1</strong>
+              </div>
+
+              <div class="summary-stats-grid">
+                <div class="stat-pill">
+                  <span class="stat-label">Best Score</span>
+                  <span class="stat-val" id="final-best">0</span>
+                </div>
+                <div class="stat-pill">
+                  <span class="stat-label">Time Survived</span>
+                  <span class="stat-val" id="final-time">0:00</span>
+                </div>
+                <div class="stat-pill">
+                  <span class="stat-label">Stars Caught</span>
+                  <span class="stat-val" id="final-caught">0</span>
+                </div>
+                <div class="stat-pill">
+                  <span class="stat-label">Misses</span>
+                  <span class="stat-val" id="final-misses">5 / 5</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="btn-group">
+              <button id="btn-play-again" class="btn btn-primary" type="button">
+                <span>Play Again</span>
+              </button>
+              <button id="btn-gameover-leaderboard" class="btn btn-secondary" type="button">
+                <span>🏆 Leaderboard</span>
+              </button>
+              <button id="btn-back-home" class="btn btn-secondary" type="button">
+                <span>Home</span>
+              </button>
+            </div>
+            <p class="shortcut-tip">Press <kbd>Space</kbd> to play again</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Controls and Shortcut hint -->
+    <footer class="game-footer">
+      <div class="keyboard-hints" aria-hidden="true">
+        <span><kbd>Space</kbd> Start / Restart</span>
+        <span><kbd>P</kbd> Pause</span>
+      </div>
+      <p class="copyright">Catch the Stars &bull; Built with Vanilla HTML5, CSS &amp; JavaScript</p>
+    </footer>
+  </div>
+
+  <!-- INSTRUCTIONS MODAL -->
+  <div id="modal-instructions" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="modal-title" class="modal-title">⭐ How to Play</h2>
+        <button id="btn-close-modal" class="modal-close-btn" type="button" aria-label="Close instructions">×</button>
+      </div>
+
+      <div class="modal-body">
+        <ul class="rules-list">
+          <li>
+            <span class="rule-icon">👆</span>
+            <div>
+              <strong>Click or tap falling stars</strong> before they reach the bottom of the game area.
+            </div>
+          </li>
+          <li>
+            <span class="rule-icon">⏳</span>
+            <div>
+              <strong>Endless Survival Mode:</strong> No time limit! Stay alive and rack up points as long as you can.
+            </div>
+          </li>
+          <li>
+            <span class="rule-icon">💔</span>
+            <div>
+              <strong>Don't miss 5 stars!</strong> If 5 stars escape past the bottom, the game ends.
+            </div>
+          </li>
+          <li>
+            <span class="rule-icon">👤</span>
+            <div>
+              <strong>Sign in with Gmail:</strong> Log in with your Gmail to record and save your personal high score!
+            </div>
+          </li>
+          <li>
+            <span class="rule-icon">🌟</span>
+            <div>
+              <strong>Star Types &amp; Bonus Points:</strong>
+              <div class="star-types-detail">
+                <div class="star-type-badge normal">
+                  <span>⭐ Normal Star</span>
+                  <strong>+1 pt</strong>
+                </div>
+                <div class="star-type-badge golden">
+                  <span>🌟 Golden Star</span>
+                  <strong>+3 pts</strong>
+                </div>
+                <div class="star-type-badge supernova">
+                  <span>💫 Supernova Star</span>
+                  <strong>+5 pts</strong>
+                </div>
+              </div>
+            </div>
+          </li>
+          <li>
+            <span class="rule-icon">📈</span>
+            <div>
+              <strong>Dynamic Speed:</strong> As your score increases, stars fall faster and appear more often!
+            </div>
+          </li>
+          <li>
+            <span class="rule-icon">⌨️</span>
+            <div>
+              <strong>Keyboard Controls:</strong>
+              <p style="margin: 4px 0 0 0; color: #a5b4fc; font-size: 0.9rem;">
+                <kbd>Space</kbd> Start/Play Again &nbsp;|&nbsp; <kbd>P</kbd> Pause/Resume &nbsp;|&nbsp; <kbd>M</kbd> Mute Audio
+              </p>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-modal-gotit" class="btn btn-primary" type="button">Got It! Let's Play</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- GOOGLE / GMAIL SIGN IN MODAL -->
+  <div id="modal-google" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="google-modal-title">
+    <div class="modal-content google-auth-modal">
+      <div class="modal-header">
+        <div class="google-modal-brand">
+          <svg class="google-g-logo" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17z"/>
+            <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.26v3.15C3.29 21.36 7.37 24 12 24z"/>
+            <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.26C.46 8.16 0 9.94 0 12s.46 3.84 1.26 5.42l4.02-3.15z"/>
+            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.37 0 3.29 2.64 1.26 6.58l4.02 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+          </svg>
+          <h2 id="google-modal-title" class="modal-title">Sign in with Google</h2>
+        </div>
+        <button id="btn-close-google-modal" class="modal-close-btn" type="button" aria-label="Close dialog">×</button>
+      </div>
+
+      <div class="modal-body google-auth-body">
+        <p class="auth-desc">Sign in with your Gmail to save your personalized high scores and sync your cosmic rank.</p>
+        
+        <!-- Official Google Identity Services container (if Client ID configured) -->
+        <div id="g_id_signin_placeholder" class="g-signin-placeholder"></div>
+
+        <!-- Interactive Gmail sign in form -->
+        <form id="form-gmail-login" class="gmail-form" onsubmit="return false;">
+          <label for="input-gmail" class="form-label">Enter your Gmail address:</label>
+          <div class="input-row">
+            <input type="email" id="input-gmail" class="auth-input" placeholder="player@gmail.com" autocomplete="email" required>
+            <button type="submit" id="btn-submit-gmail" class="btn btn-primary btn-auth-submit">Sign In</button>
+          </div>
+        </form>
+
+        <div class="auth-divider"><span>OR ONE-CLICK SIGN IN</span></div>
+
+        <!-- Instant 1-click accounts for seamless local playing -->
+        <div class="quick-accounts">
+          <button class="quick-account-btn" type="button" data-email="starcatcher@gmail.com" data-name="Star Catcher">
+            <span class="account-avatar">⭐</span>
+            <div class="account-info">
+              <span class="account-name">Star Catcher</span>
+              <span class="account-email">starcatcher@gmail.com</span>
+            </div>
+          </button>
+          <button class="quick-account-btn" type="button" data-email="cosmic.player@gmail.com" data-name="Cosmic Player">
+            <span class="account-avatar">🚀</span>
+            <div class="account-info">
+              <span class="account-name">Cosmic Player</span>
+              <span class="account-email">cosmic.player@gmail.com</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHANGE IN-GAME NAME MODAL -->
+  <div id="modal-change-ign" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="change-ign-title">
+    <div class="modal-content auth-modal">
+      <div class="modal-header">
+        <div class="auth-title-group">
+          <span class="modal-header-icon" aria-hidden="true">✏️</span>
+          <div>
+            <h2 id="change-ign-title" class="modal-title">Change In-Game Name</h2>
+            <p class="auth-subtitle">Update your alias in the arena &amp; leaderboard</p>
+          </div>
+        </div>
+        <button id="btn-close-change-ign" class="modal-close-btn" type="button" aria-label="Close name change dialog">×</button>
+      </div>
+
+      <div class="modal-body auth-body">
+        <div id="change-ign-alert" class="auth-alert hidden" role="alert"></div>
+
+        <form id="form-change-ign" class="auth-form" novalidate>
+          <div class="form-group">
+            <label for="input-new-ign" class="form-label">
+              <span>New In-Game Name</span>
+              <span class="form-required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="input-icon" aria-hidden="true">👤</span>
+              <input
+                type="text"
+                id="input-new-ign"
+                class="form-input"
+                placeholder="e.g. StarLord, CosmicAce"
+                minlength="2"
+                maxlength="16"
+                required
+                autocomplete="off"
+              />
+            </div>
+            <span class="form-help">Must be 2 to 16 characters. Unique across all players.</span>
+          </div>
+
+          <div class="btn-group" style="margin-top: 14px;">
+            <button type="submit" id="btn-submit-change-ign" class="btn btn-primary">
+              <span id="btn-change-ign-text">Save New Name</span>
+              <span id="btn-change-ign-spinner" class="auth-spinner hidden" aria-hidden="true"></span>
+            </button>
+            <button type="button" id="btn-cancel-change-ign" class="btn btn-secondary">
+              <span>Cancel</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- COSMIC LEADERBOARD MODAL -->
+  <div id="modal-leaderboard" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="leaderboard-title">
+    <div class="modal-content leaderboard-modal">
+      <div class="modal-header">
+        <div class="leaderboard-title-group">
+          <span class="modal-header-icon" aria-hidden="true">🏆</span>
+          <div>
+            <h2 id="leaderboard-title" class="modal-title">Galactic Leaderboard</h2>
+            <span id="lb-player-count" class="lb-player-count">Cosmic Rankings</span>
+          </div>
+        </div>
+        <button id="btn-close-leaderboard" class="modal-close-btn" type="button" aria-label="Close leaderboard">×</button>
+      </div>
+
+      <div class="modal-body leaderboard-body">
+        <p class="auth-desc">Top celestial star catchers ranked by all-time highest score.</p>
+
+        <!-- Top 3 Podium Highlights -->
+        <div id="leaderboard-podium" class="podium-row" aria-hidden="true"></div>
+
+        <!-- Empty state when no players have played yet -->
+        <div id="leaderboard-empty" class="leaderboard-empty hidden">
+          <span class="empty-icon">🌌</span>
+          <p class="empty-title">The Cosmos is Waiting</p>
+          <p class="empty-subtitle">No scores recorded yet. Be the first to claim #1 on the leaderboard!</p>
+        </div>
+
+        <!-- Full Rankings Table -->
+        <div id="leaderboard-table-container" class="leaderboard-table-container">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th class="th-rank">Rank</th>
+                <th class="th-player">Player (IGN)</th>
+                <th class="th-score">Score</th>
+                <th class="th-time">Survived</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-tbody">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-leaderboard-close-btn" class="btn btn-primary" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
