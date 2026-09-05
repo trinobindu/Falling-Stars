@@ -16,19 +16,36 @@ module.exports = async function handler(req, res) {
   const email = (data.email || '').trim().toLowerCase();
   const score = parseInt(data.score, 10) || 0;
   const timeSurvived = (data.timeSurvived || '0:00').trim();
+  const ign = (data.ign || '').trim();
 
   if (!email) {
     return sendJson(res, 400, { error: 'Email is required to record score.' });
   }
 
   try {
-    const player = await getPlayerByEmail(email);
+    let player = await getPlayerByEmail(email);
     if (!player) {
-      return sendJson(res, 404, { error: 'Player account not found.' });
+      // Auto-create player so scores and signups are NEVER rejected or lost
+      const fallbackIgn = ign || email.split('@')[0] || 'Star Pilot';
+      player = {
+        id: 'usr_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7),
+        email,
+        ign: fallbackIgn,
+        signupDate: new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
+        highestScore: 0,
+        timeSurvived: '0:00',
+        gamesPlayed: 0
+      };
     }
 
     player.gamesPlayed = (player.gamesPlayed || 0) + 1;
+    player.lastLogin = new Date().toISOString();
     player.lastActive = new Date().toISOString();
+
+    if (ign && (!player.ign || player.ign === email.split('@')[0])) {
+      player.ign = ign;
+    }
 
     let isNewHigh = false;
     if (score > (player.highestScore || 0)) {
@@ -40,7 +57,7 @@ module.exports = async function handler(req, res) {
     await savePlayer(player);
 
     const all = (await loadAllPlayers()).sort((a, b) => (b.highestScore || 0) - (a.highestScore || 0));
-    const rankIndex = all.findIndex((p) => p.email.toLowerCase() === email);
+    const rankIndex = all.findIndex((p) => p.email && p.email.toLowerCase() === email);
     const rank = rankIndex >= 0 ? rankIndex + 1 : '-';
 
     return sendJson(res, 200, {
@@ -53,6 +70,6 @@ module.exports = async function handler(req, res) {
     });
   } catch (saveErr) {
     console.error('Save score error:', saveErr);
-    return sendJson(res, 500, { error: 'Server error saving score.' });
+    return sendJson(res, 500, { error: 'Server error saving score: ' + saveErr.message });
   }
 };

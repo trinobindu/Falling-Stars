@@ -718,10 +718,16 @@
 
     async getLeaderboard() {
       try {
-        const res = await fetch(`${API_BASE}/api/leaderboard`);
+        const res = await fetch(`${API_BASE}/api/leaderboard?t=${Date.now()}`, {
+          cache: 'no-store'
+        });
         if (res.ok) {
           const data = await res.json();
-          return data.leaderboard || [];
+          const list = data.leaderboard || [];
+          try {
+            localStorage.setItem(LEADERBOARD_STORAGE_KEY, JSON.stringify(list));
+          } catch (e) {}
+          return list;
         }
       } catch (e) {}
       // Fallback to local storage if server unreachable
@@ -732,12 +738,12 @@
       return [];
     },
 
-    async recordScore(email, score, timeSurvived) {
+    async recordScore(email, score, timeSurvived, ign) {
       try {
         const res = await fetch(`${API_BASE}/api/score`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, score, timeSurvived })
+          body: JSON.stringify({ email, score, timeSurvived, ign })
         });
         if (res.ok) {
           return await res.json();
@@ -966,6 +972,7 @@
     applyUserSession(user);
     closeGoogleModal();
     soundEngine.uiClick();
+    renderLeaderboard();
   }
 
   // Sign out current user and return to guest mode
@@ -1342,7 +1349,7 @@
     // Record score into server folder & leaderboard
     if (state.currentUser) {
       const timeStr = formatTime(state.elapsedSeconds);
-      const res = await API.recordScore(state.currentUser.email, state.score, timeStr);
+      const res = await API.recordScore(state.currentUser.email, state.score, timeStr, state.currentUser.ign);
       if (res && res.rank) {
         if (DOM.finalRank) DOM.finalRank.textContent = `#${res.rank}`;
         if (DOM.readyRank) DOM.readyRank.textContent = `#${res.rank}`;
@@ -1350,6 +1357,7 @@
         const localRank = await getPlayerRank();
         if (DOM.finalRank) DOM.finalRank.textContent = typeof localRank === 'number' ? `#${localRank}` : localRank;
       }
+      renderLeaderboard();
     } else {
       if (DOM.finalRank) DOM.finalRank.textContent = '-';
     }
@@ -1639,7 +1647,18 @@
 
     // Google / Gmail Auth triggers
     if (DOM.btnGoogleLogin) {
-      DOM.btnGoogleLogin.addEventListener('click', openGoogleModal);
+      DOM.btnGoogleLogin.addEventListener('click', () => {
+        soundEngine.init();
+        soundEngine.uiClick();
+        if (DOM.overlayStart && !DOM.overlayStart.classList.contains('hidden')) {
+          if (DOM.signupGmail) {
+            DOM.signupGmail.focus();
+            DOM.signupGmail.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        } else {
+          openGoogleModal();
+        }
+      });
     }
     if (DOM.btnCloseGoogleModal) {
       DOM.btnCloseGoogleModal.addEventListener('click', closeGoogleModal);
@@ -1655,20 +1674,26 @@
       DOM.btnSignOut.addEventListener('click', signOutUser);
     }
 
-    // Gmail form manual submit
+    // Gmail form manual submit with auto server registration
     if (DOM.formGmailLogin) {
-      DOM.formGmailLogin.addEventListener('submit', (e) => {
+      DOM.formGmailLogin.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = (DOM.inputGmail.value || '').trim();
+        const email = (DOM.inputGmail.value || '').trim().toLowerCase();
         if (email) {
           const namePart = email.split('@')[0];
           const displayName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
-          signInUser({
+          let res = await API.signup(email, 'player123', displayName);
+          if (!res.ok && res.status === 409) {
+            res = await API.login(email, 'player123');
+          }
+          const user = (res && res.data && res.data.user) ? res.data.user : {
             ign: displayName,
             name: displayName,
             email: email,
+            highestScore: 0,
             avatar: null
-          });
+          };
+          signInUser(user);
           DOM.inputGmail.value = '';
         }
       });

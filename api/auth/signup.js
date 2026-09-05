@@ -32,6 +32,29 @@ module.exports = async function handler(req, res) {
 
     const existingEmail = players.find(p => p.email && p.email.toLowerCase() === email);
     if (existingEmail) {
+      if (!existingEmail.hash) {
+        // Player was auto-created during gameplay; set password & preferred IGN now!
+        const { salt, hash } = hashPassword(password);
+        existingEmail.salt = salt;
+        existingEmail.hash = hash;
+        existingEmail.ign = ign;
+        existingEmail.lastLogin = new Date().toISOString();
+        await savePlayer(existingEmail);
+
+        return sendJson(res, 200, {
+          success: true,
+          message: 'Account registered and password saved! Welcome to Catch the Stars.',
+          user: {
+            id: existingEmail.id,
+            email: existingEmail.email,
+            ign: existingEmail.ign,
+            highestScore: existingEmail.highestScore || 0,
+            timeSurvived: existingEmail.timeSurvived || '0:00',
+            gamesPlayed: existingEmail.gamesPlayed || 0
+          }
+        });
+      }
+
       return sendJson(res, 409, {
         error: 'An account with this Gmail already exists. Please log in with your password instead!'
       });
