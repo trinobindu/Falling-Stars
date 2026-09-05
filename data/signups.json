@@ -1,6 +1,6 @@
 {
-  "totalSignups": 2,
-  "lastUpdated": "2026-09-05T13:55:53.237Z",
+  "totalSignups": 3,
+  "lastUpdated": "2026-09-05T14:10:49.632Z",
   "players": [
     {
       "id": "usr_1788616553024_d2zd1",
@@ -21,6 +21,16 @@
       "timeSurvived": "2:15",
       "gamesPlayed": 1,
       "lastLogin": "2026-09-05T13:55:53.102Z"
+    },
+    {
+      "id": "usr_1788616918113_13k4n",
+      "email": "td5298@srmist.edu.in",
+      "ign": "TRINOBINDU DAS",
+      "signupDate": "2026-09-05T14:01:58.113Z",
+      "highestScore": 41,
+      "timeSurvived": "0:26",
+      "gamesPlayed": 7,
+      "lastLogin": "2026-09-05T14:10:28.000Z"
     }
   ]
 }

@@ -280,11 +280,19 @@ html, body {
   outline-offset: 2px;
 }
 
+.hidden {
+  display: none !important;
+}
+
 /* --- HUD (Heads Up Display) --- */
 .game-hud {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
+}
+
+.game-hud.hidden {
+  display: none !important;
 }
 
 .hud-card {

@@ -123,6 +123,7 @@
     btnSignOut: document.getElementById('btn-signout'),
 
     // HUD
+    gameHud: document.getElementById('game-hud'),
     scoreDisplay: document.getElementById('score-display'),
     timeDisplay: document.getElementById('time-display'),
     timerProgress: document.getElementById('timer-progress'),
@@ -213,7 +214,8 @@
     readyEmail: document.getElementById('ready-email'),
     readyBest: document.getElementById('ready-best'),
     readyRank: document.getElementById('ready-rank'),
-    btnSwitchPlayer: document.getElementById('btn-switch-player')
+    btnSwitchPlayer: document.getElementById('btn-switch-player'),
+    startDesc: document.getElementById('start-desc')
   };
 
   /* ==========================================================================
@@ -775,7 +777,7 @@
     const currentEmail = state.currentUser ? state.currentUser.email.toLowerCase() : '';
 
     if (DOM.lbPlayerCount) {
-      DOM.lbPlayerCount.textContent = `${board.length} Real Player${board.length === 1 ? '' : 's'}`;
+      DOM.lbPlayerCount.textContent = `${board.length} Player${board.length === 1 ? '' : 's'}`;
     }
 
     // If 0 players have scored, show friendly empty state
@@ -789,7 +791,7 @@
     if (DOM.leaderboardEmpty) DOM.leaderboardEmpty.classList.add('hidden');
     if (DOM.leaderboardTableContainer) DOM.leaderboardTableContainer.classList.remove('hidden');
 
-    // Render Podium dynamically for up to 3 real players
+    // Render Podium dynamically for up to 3 players
     if (DOM.leaderboardPodium) {
       const podiumCount = Math.min(3, board.length);
       let podiumHtml = '';
@@ -877,8 +879,11 @@
   // Update Start Screen UI (Login Gate vs Ready Player Card)
   function updateStartScreenUI() {
     if (state.currentUser) {
+      // Reveal Game HUD & Player Ready Card only when logged in
+      if (DOM.gameHud) DOM.gameHud.classList.remove('hidden');
       if (DOM.startGateLogin) DOM.startGateLogin.classList.add('hidden');
       if (DOM.startPlayerReady) DOM.startPlayerReady.classList.remove('hidden');
+      if (DOM.startDesc) DOM.startDesc.textContent = 'Endless Cosmic Survival! Catch falling stars before 5 escape.';
 
       if (DOM.readyIgn) DOM.readyIgn.textContent = state.currentUser.ign;
       if (DOM.readyEmail) DOM.readyEmail.textContent = state.currentUser.email;
@@ -886,8 +891,11 @@
       if (DOM.readyBest) DOM.readyBest.textContent = state.highScore;
       updateReadyRank();
     } else {
+      // Hide Game HUD, Best Score, and Start Game on opening window
+      if (DOM.gameHud) DOM.gameHud.classList.add('hidden');
       if (DOM.startGateLogin) DOM.startGateLogin.classList.remove('hidden');
       if (DOM.startPlayerReady) DOM.startPlayerReady.classList.add('hidden');
+      if (DOM.startDesc) DOM.startDesc.textContent = 'Sign in or create an account to enter the arena and play.';
       clearAuthAlert();
     }
   }

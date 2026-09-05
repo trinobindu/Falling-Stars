@@ -74,8 +74,8 @@
       </div>
     </header>
 
-    <!-- Game HUD (Heads-Up Display) -->
-    <section class="game-hud" aria-label="Game Information">
+    <!-- Game HUD (Heads-Up Display) - Hidden until user signs in -->
+    <section id="game-hud" class="game-hud hidden" aria-label="Game Information">
       <div class="hud-card" id="hud-score">
         <span class="hud-label">Score</span>
         <span class="hud-value" id="score-display">0</span>
@@ -131,8 +131,8 @@
           <div class="overlay-card start-card-adaptive">
             <div class="hero-star" aria-hidden="true">⭐</div>
             <h2 id="start-title" class="overlay-title">Catch the Stars</h2>
-            <p class="overlay-text">
-              Endless Cosmic Survival! Catch falling stars before 5 escape.
+            <p id="start-desc" class="overlay-text">
+              Sign in or create an account to enter the arena and play.
             </p>
 
             <!-- MANDATORY LOGIN GATE (Sign Up & Log In with Password) -->
@@ -217,23 +217,22 @@
                   <span>🏆 Leaderboard</span>
                 </button>
               </div>
+              <div class="star-preview-row" aria-hidden="true">
+                <div class="preview-item">
+                  <span class="preview-star star-normal">⭐</span>
+                  <span class="preview-pts">+1 pt</span>
+                </div>
+                <div class="preview-item">
+                  <span class="preview-star star-golden">🌟</span>
+                  <span class="preview-pts">+3 pts</span>
+                </div>
+                <div class="preview-item">
+                  <span class="preview-star star-supernova">💫</span>
+                  <span class="preview-pts">+5 pts</span>
+                </div>
+              </div>
               <button id="btn-switch-player" class="btn-text-switch" type="button">Switch Player / Log Out</button>
               <p class="shortcut-tip"><kbd>Space</kbd> or tap to begin</p>
-            </div>
-
-            <div class="star-preview-row" aria-hidden="true">
-              <div class="preview-item">
-                <span class="preview-star star-normal">⭐</span>
-                <span class="preview-pts">+1 pt</span>
-              </div>
-              <div class="preview-item">
-                <span class="preview-star star-golden">🌟</span>
-                <span class="preview-pts">+3 pts</span>
-              </div>
-              <div class="preview-item">
-                <span class="preview-star star-supernova">💫</span>
-                <span class="preview-pts">+5 pts</span>
-              </div>
             </div>
           </div>
         </div>
@@ -465,7 +464,7 @@
           <span class="modal-header-icon" aria-hidden="true">🏆</span>
           <div>
             <h2 id="leaderboard-title" class="modal-title">Galactic Leaderboard</h2>
-            <span id="lb-player-count" class="lb-player-count">Real Players Only</span>
+            <span id="lb-player-count" class="lb-player-count">Cosmic Rankings</span>
           </div>
         </div>
         <button id="btn-close-leaderboard" class="modal-close-btn" type="button" aria-label="Close leaderboard">×</button>
@@ -481,7 +480,7 @@
         <div id="leaderboard-empty" class="leaderboard-empty hidden">
           <span class="empty-icon">🌌</span>
           <p class="empty-title">The Cosmos is Waiting</p>
-          <p class="empty-subtitle">No real players have set a score yet. Be the first to claim #1!</p>
+          <p class="empty-subtitle">No scores recorded yet. Be the first to claim #1 on the leaderboard!</p>
         </div>
 
         <!-- Full Rankings Table -->
