@@ -173,7 +173,32 @@
     btnCloseGoogleModal: document.getElementById('btn-close-google-modal'),
     formGmailLogin: document.getElementById('form-gmail-login'),
     inputGmail: document.getElementById('input-gmail'),
-    quickAccountBtns: document.querySelectorAll('.quick-account-btn')
+    quickAccountBtns: document.querySelectorAll('.quick-account-btn'),
+
+    // Leaderboard
+    btnLeaderboardNav: document.getElementById('btn-leaderboard-nav'),
+    modalLeaderboard: document.getElementById('modal-leaderboard'),
+    btnCloseLeaderboard: document.getElementById('btn-close-leaderboard'),
+    btnLeaderboardCloseBtn: document.getElementById('btn-leaderboard-close-btn'),
+    leaderboardTbody: document.getElementById('leaderboard-tbody'),
+    leaderboardPodium: document.getElementById('leaderboard-podium'),
+    btnStartLeaderboard: document.getElementById('btn-start-leaderboard'),
+    btnGameoverLeaderboard: document.getElementById('btn-gameover-leaderboard'),
+    finalRank: document.getElementById('final-rank'),
+
+    // Start Screen Adaptive Cards
+    startGateLogin: document.getElementById('start-gate-login'),
+    formGateLogin: document.getElementById('form-gate-login'),
+    gateIgn: document.getElementById('gate-ign'),
+    gateGmail: document.getElementById('gate-gmail'),
+    quickPickBtns: document.querySelectorAll('.quick-pick-btn'),
+    startPlayerReady: document.getElementById('start-player-ready'),
+    readyAvatar: document.getElementById('ready-avatar'),
+    readyIgn: document.getElementById('ready-ign'),
+    readyEmail: document.getElementById('ready-email'),
+    readyBest: document.getElementById('ready-best'),
+    readyRank: document.getElementById('ready-rank'),
+    btnSwitchPlayer: document.getElementById('btn-switch-player')
   };
 
   /* ==========================================================================
@@ -621,10 +646,19 @@
   }
 
   /* ==========================================================================
-     9. HIGH SCORE & GMAIL AUTHENTICATION
+     9. HIGH SCORE, GMAIL AUTHENTICATION & COSMIC LEADERBOARD
      ========================================================================== */
   const USER_STORAGE_KEY = 'catchTheStars_userProfile';
   const SOUND_STORAGE_KEY = 'catchTheStars_soundEnabled';
+  const LEADERBOARD_STORAGE_KEY = 'catchTheStars_cosmicLeaderboard';
+
+  const DEFAULT_LEADERBOARD = [
+    { ign: 'NovaQueen', email: 'novaqueen@gmail.com', score: 85, time: '3:45', date: 'Elite' },
+    { ign: 'CosmicAce', email: 'cosmicace@gmail.com', score: 68, time: '2:50', date: 'Master' },
+    { ign: 'StarLord', email: 'starlord@gmail.com', score: 52, time: '2:15', date: 'Veteran' },
+    { ign: 'AstroKid', email: 'astro@gmail.com', score: 36, time: '1:30', date: 'Cadet' },
+    { ign: 'OrbitSeeker', email: 'orbit@gmail.com', score: 24, time: '1:05', date: 'Rookie' }
+  ];
 
   // Return unique localStorage key based on current Gmail user
   function getHighScoreKey() {
@@ -658,6 +692,158 @@
     }
   }
 
+  // Leaderboard storage helpers
+  function loadLeaderboard() {
+    try {
+      const saved = localStorage.getItem(LEADERBOARD_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      console.warn('Leaderboard load error:', e);
+    }
+    return [...DEFAULT_LEADERBOARD];
+  }
+
+  function saveLeaderboard(list) {
+    try {
+      localStorage.setItem(LEADERBOARD_STORAGE_KEY, JSON.stringify(list));
+    } catch (e) {
+      console.warn('Leaderboard save error:', e);
+    }
+  }
+
+  // Record a score for the active player into the leaderboard
+  function recordPlayerScore(score, timeSeconds) {
+    if (!state.currentUser) return '-';
+
+    const board = loadLeaderboard();
+    const playerEmail = state.currentUser.email.toLowerCase();
+    const playerIgn = state.currentUser.ign || state.currentUser.name || 'Star Player';
+    const timeStr = formatTime(timeSeconds);
+
+    let entry = board.find((p) => p.email && p.email.toLowerCase() === playerEmail);
+
+    if (entry) {
+      if (score > entry.score) {
+        entry.score = score;
+        entry.time = timeStr;
+        entry.ign = playerIgn;
+        entry.date = 'Today';
+      }
+    } else {
+      board.push({
+        ign: playerIgn,
+        email: playerEmail,
+        score: score,
+        time: timeStr,
+        date: 'Today'
+      });
+    }
+
+    // Sort descending by score
+    board.sort((a, b) => b.score - a.score);
+
+    // Keep top 25
+    const trimmed = board.slice(0, 25);
+    saveLeaderboard(trimmed);
+
+    // Find rank index (1-indexed)
+    const rankIndex = trimmed.findIndex((p) => p.email && p.email.toLowerCase() === playerEmail);
+    return rankIndex >= 0 ? rankIndex + 1 : '-';
+  }
+
+  // Get current player's rank
+  function getPlayerRank() {
+    if (!state.currentUser) return '-';
+    const board = loadLeaderboard();
+    const playerEmail = state.currentUser.email.toLowerCase();
+    const rankIndex = board.findIndex((p) => p.email && p.email.toLowerCase() === playerEmail);
+    return rankIndex >= 0 ? rankIndex + 1 : '-';
+  }
+
+  // Render leaderboard UI (Podium + Table)
+  function renderLeaderboard() {
+    const board = loadLeaderboard();
+    const medals = ['🥇', '🥈', '🥉'];
+    const currentEmail = state.currentUser ? state.currentUser.email.toLowerCase() : '';
+
+    // Render Podium
+    if (DOM.leaderboardPodium) {
+      let podiumHtml = '';
+      for (let i = 0; i < Math.min(3, board.length); i++) {
+        const item = board[i];
+        podiumHtml += `
+          <div class="podium-card rank-${i + 1}">
+            <span class="podium-medal">${medals[i]}</span>
+            <span class="podium-ign" title="${item.ign}">${item.ign}</span>
+            <span class="podium-score">${item.score} pts</span>
+            <span class="podium-time">${item.time}</span>
+          </div>
+        `;
+      }
+      DOM.leaderboardPodium.innerHTML = podiumHtml;
+    }
+
+    // Render Table Rows
+    if (DOM.leaderboardTbody) {
+      DOM.leaderboardTbody.innerHTML = board.map((item, idx) => {
+        const isCurrent = item.email && item.email.toLowerCase() === currentEmail;
+        const medalOrRank = idx < 3 ? `${medals[idx]} #${idx + 1}` : `#${idx + 1}`;
+        return `
+          <tr class="${isCurrent ? 'current-user-row' : ''}">
+            <td class="td-rank">${medalOrRank}</td>
+            <td class="td-player">
+              <strong>${item.ign || 'Player'}</strong>
+              ${isCurrent ? '<span class="you-pill">YOU</span>' : ''}
+            </td>
+            <td class="td-score">${item.score}</td>
+            <td class="td-time">${item.time}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+  }
+
+  function openLeaderboard() {
+    soundEngine.init();
+    soundEngine.uiClick();
+
+    if (state.isRunning && !state.isPaused) {
+      pauseGame();
+    }
+
+    renderLeaderboard();
+    DOM.modalLeaderboard.classList.remove('hidden');
+    DOM.btnCloseLeaderboard.focus();
+  }
+
+  function closeLeaderboard() {
+    soundEngine.uiClick();
+    DOM.modalLeaderboard.classList.add('hidden');
+  }
+
+  // Update Start Screen UI (Login Gate vs Ready Player Card)
+  function updateStartScreenUI() {
+    if (state.currentUser) {
+      if (DOM.startGateLogin) DOM.startGateLogin.classList.add('hidden');
+      if (DOM.startPlayerReady) DOM.startPlayerReady.classList.remove('hidden');
+
+      if (DOM.readyIgn) DOM.readyIgn.textContent = state.currentUser.ign;
+      if (DOM.readyEmail) DOM.readyEmail.textContent = state.currentUser.email;
+      if (DOM.readyAvatar) DOM.readyAvatar.textContent = (state.currentUser.ign || 'P').charAt(0).toUpperCase();
+      if (DOM.readyBest) DOM.readyBest.textContent = state.highScore;
+      if (DOM.readyRank) DOM.readyRank.textContent = '#' + getPlayerRank();
+    } else {
+      if (DOM.startGateLogin) DOM.startGateLogin.classList.remove('hidden');
+      if (DOM.startPlayerReady) DOM.startPlayerReady.classList.add('hidden');
+      if (DOM.gateIgn) DOM.gateIgn.value = '';
+    }
+  }
+
   // Load saved user session from localStorage
   function loadUserSession() {
     try {
@@ -665,6 +851,9 @@
       if (saved) {
         const user = JSON.parse(saved);
         if (user && user.email) {
+          if (!user.ign) {
+            user.ign = user.name || user.email.split('@')[0];
+          }
           applyUserSession(user);
           return;
         }
@@ -677,6 +866,11 @@
 
   // Sign in user profile
   function signInUser(user) {
+    if (!user.ign || !user.ign.trim()) {
+      user.ign = user.name || user.email.split('@')[0];
+    }
+    user.ign = user.ign.trim();
+
     state.currentUser = user;
     try {
       localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user));
@@ -685,9 +879,6 @@
     applyUserSession(user);
     closeGoogleModal();
     soundEngine.uiClick();
-
-    // Auto-update HUD
-    loadHighScore();
   }
 
   // Sign out current user and return to guest mode
@@ -703,16 +894,17 @@
   // Update UI for signed-in user
   function applyUserSession(user) {
     state.currentUser = user;
-    const initial = (user.name || user.email || 'U').charAt(0).toUpperCase();
+    const initial = (user.ign || user.email || 'P').charAt(0).toUpperCase();
 
     DOM.userAvatar.textContent = initial;
-    DOM.userName.textContent = user.name || 'Cosmic Player';
+    DOM.userName.textContent = user.ign || 'Player';
     DOM.userEmail.textContent = user.email || '';
 
     DOM.userProfileBadge.classList.remove('hidden');
     DOM.btnGoogleLogin.style.display = 'none';
 
     loadHighScore();
+    updateStartScreenUI();
   }
 
   // Update UI for guest mode
@@ -722,6 +914,7 @@
     DOM.btnGoogleLogin.style.display = 'inline-flex';
 
     loadHighScore();
+    updateStartScreenUI();
   }
 
   // Google Modal controls
@@ -824,6 +1017,15 @@
 
   // Start / Restart a fresh game session
   function startGame() {
+    // Enforce mandatory login & in-game name
+    if (!state.currentUser) {
+      soundEngine.init();
+      soundEngine.uiClick();
+      updateStartScreenUI();
+      if (DOM.gateIgn) DOM.gateIgn.focus();
+      return;
+    }
+
     soundEngine.init();
     soundEngine.uiClick();
 
@@ -928,6 +1130,12 @@
     // Hide in-game pause button
     DOM.btnPause.style.display = 'none';
 
+    // Record score into Cosmic Leaderboard
+    const playerRank = recordPlayerScore(state.score, state.elapsedSeconds);
+    if (DOM.finalRank) {
+      DOM.finalRank.textContent = typeof playerRank === 'number' ? `#${playerRank}` : playerRank;
+    }
+
     // Determine if new best score achieved
     const isNewHigh = state.score > 0 && state.score >= state.highScore;
     if (state.score > state.highScore) {
@@ -989,7 +1197,8 @@
     DOM.overlayStart.classList.remove('hidden');
     DOM.overlayStart.classList.add('active');
     DOM.btnPause.style.display = 'none';
-    DOM.btnStart.focus();
+
+    updateStartScreenUI();
   }
 
   // Instructions Modal controls
@@ -1042,6 +1251,70 @@
       }
     });
 
+    // Start screen mandatory login gate form
+    if (DOM.formGateLogin) {
+      DOM.formGateLogin.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const ign = (DOM.gateIgn.value || '').trim();
+        const email = (DOM.gateGmail.value || '').trim();
+        if (ign && email) {
+          signInUser({
+            ign: ign,
+            name: ign,
+            email: email,
+            avatar: null
+          });
+        }
+      });
+    }
+
+    // Quick-pick identity buttons in start gate
+    if (DOM.quickPickBtns) {
+      DOM.quickPickBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const ign = btn.getAttribute('data-ign');
+          const email = btn.getAttribute('data-email');
+          if (ign && email) {
+            signInUser({
+              ign: ign,
+              name: ign,
+              email: email,
+              avatar: null
+            });
+          }
+        });
+      });
+    }
+
+    // Switch player / Log out button on player ready card
+    if (DOM.btnSwitchPlayer) {
+      DOM.btnSwitchPlayer.addEventListener('click', signOutUser);
+    }
+
+    // Leaderboard trigger buttons
+    if (DOM.btnLeaderboardNav) {
+      DOM.btnLeaderboardNav.addEventListener('click', openLeaderboard);
+    }
+    if (DOM.btnStartLeaderboard) {
+      DOM.btnStartLeaderboard.addEventListener('click', openLeaderboard);
+    }
+    if (DOM.btnGameoverLeaderboard) {
+      DOM.btnGameoverLeaderboard.addEventListener('click', openLeaderboard);
+    }
+    if (DOM.btnCloseLeaderboard) {
+      DOM.btnCloseLeaderboard.addEventListener('click', closeLeaderboard);
+    }
+    if (DOM.btnLeaderboardCloseBtn) {
+      DOM.btnLeaderboardCloseBtn.addEventListener('click', closeLeaderboard);
+    }
+    if (DOM.modalLeaderboard) {
+      DOM.modalLeaderboard.addEventListener('click', (e) => {
+        if (e.target === DOM.modalLeaderboard) {
+          closeLeaderboard();
+        }
+      });
+    }
+
     // Google / Gmail Auth triggers
     if (DOM.btnGoogleLogin) {
       DOM.btnGoogleLogin.addEventListener('click', openGoogleModal);
@@ -1069,6 +1342,7 @@
           const namePart = email.split('@')[0];
           const displayName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
           signInUser({
+            ign: displayName,
             name: displayName,
             email: email,
             avatar: null
@@ -1084,7 +1358,7 @@
         btn.addEventListener('click', () => {
           const email = btn.getAttribute('data-email');
           const name = btn.getAttribute('data-name');
-          signInUser({ name, email, avatar: null });
+          signInUser({ ign: name, name: name, email: email, avatar: null });
         });
       });
     }
@@ -1092,23 +1366,41 @@
     // Global Keyboard Shortcuts
     window.addEventListener('keydown', (e) => {
       // Modal escape close handlers
-      if (!DOM.modalGoogle.classList.contains('hidden')) {
+      if (DOM.modalLeaderboard && !DOM.modalLeaderboard.classList.contains('hidden')) {
+        if (e.key === 'Escape') {
+          closeLeaderboard();
+        }
+        return;
+      }
+
+      if (DOM.modalGoogle && !DOM.modalGoogle.classList.contains('hidden')) {
         if (e.key === 'Escape') {
           closeGoogleModal();
         }
         return;
       }
 
-      if (!DOM.modalInstructions.classList.contains('hidden')) {
+      if (DOM.modalInstructions && !DOM.modalInstructions.classList.contains('hidden')) {
         if (e.key === 'Escape') {
           closeInstructions();
         }
         return;
       }
 
+      // 'L' or 'l': Toggle Leaderboard (only if not typing in input)
+      if ((e.key === 'l' || e.key === 'L') && !(e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA'))) {
+        e.preventDefault();
+        if (DOM.modalLeaderboard && !DOM.modalLeaderboard.classList.contains('hidden')) {
+          closeLeaderboard();
+        } else {
+          openLeaderboard();
+        }
+        return;
+      }
+
       // Spacebar: Start, Play Again, or Resume if paused
       if (e.code === 'Space') {
-        if (e.target && e.target.tagName === 'BUTTON') return; // Allow native button click
+        if (e.target && (e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT')) return;
         if (!state.isRunning) {
           e.preventDefault();
           startGame();
@@ -1120,12 +1412,14 @@
 
       // 'P' or 'p': Toggle Pause
       if (e.key === 'p' || e.key === 'P') {
+        if (e.target && e.target.tagName === 'INPUT') return;
         e.preventDefault();
         togglePause();
       }
 
       // 'M' or 'm': Toggle Sound
       if (e.key === 'm' || e.key === 'M') {
+        if (e.target && e.target.tagName === 'INPUT') return;
         e.preventDefault();
         toggleSound();
       }
@@ -1229,6 +1523,7 @@
   function init() {
     loadUserSession(); // Restores Gmail user session & user-specific high score
     loadSoundSetting();
+    renderLeaderboard(); // Prepares podium and rankings
     setupEventListeners();
     initGoogleIdentityServices(); // Google OAuth GIS SDK hook
 

@@ -59,6 +59,10 @@
           <button id="btn-signout" class="signout-btn" type="button" title="Sign Out of Gmail">Sign Out</button>
         </div>
 
+        <button id="btn-leaderboard-nav" class="icon-btn" type="button" aria-label="View Leaderboard" title="Leaderboard (L)">
+          <span aria-hidden="true">🏆</span>
+          <span class="sr-only">Leaderboard</span>
+        </button>
         <button id="btn-sound" class="icon-btn" type="button" aria-label="Toggle Sound" title="Toggle Sound (M)">
           <span id="sound-icon" aria-hidden="true">🔊</span>
           <span class="sr-only">Toggle Sound</span>
@@ -124,13 +128,70 @@
 
         <!-- START SCREEN OVERLAY -->
         <div id="overlay-start" class="overlay active" role="dialog" aria-modal="true" aria-labelledby="start-title">
-          <div class="overlay-card">
+          <div class="overlay-card start-card-adaptive">
             <div class="hero-star" aria-hidden="true">⭐</div>
             <h2 id="start-title" class="overlay-title">Catch the Stars</h2>
             <p class="overlay-text">
-              Endless Cosmic Survival! Catch falling stars before 5 escape past the bottom.
+              Endless Cosmic Survival! Catch falling stars before 5 escape.
             </p>
-            
+
+            <!-- MANDATORY LOGIN GATE (Shown when player is NOT logged in) -->
+            <div id="start-gate-login" class="gate-login-section">
+              <div class="gate-badge">🔒 Login Required to Play</div>
+              <form id="form-gate-login" class="gate-form" onsubmit="return false;">
+                <div class="form-field">
+                  <label for="gate-ign" class="field-label">Choose In-Game Name (IGN):</label>
+                  <input type="text" id="gate-ign" class="auth-input" placeholder="e.g. StarLord, CosmicAce" maxlength="16" required>
+                </div>
+                <div class="form-field">
+                  <label for="gate-gmail" class="field-label">Your Gmail Address:</label>
+                  <input type="email" id="gate-gmail" class="auth-input" placeholder="player@gmail.com" required>
+                </div>
+                <button type="submit" id="btn-gate-submit" class="btn btn-primary w-full">
+                  <span>Enter Arena &amp; Play</span>
+                  <span aria-hidden="true">🚀</span>
+                </button>
+              </form>
+
+              <div class="quick-pick-section">
+                <span class="quick-pick-title">Or 1-Click Quick Select:</span>
+                <div class="quick-pick-row">
+                  <button type="button" class="quick-pick-btn" data-email="starlord@gmail.com" data-ign="StarLord">⭐ StarLord</button>
+                  <button type="button" class="quick-pick-btn" data-email="novaqueen@gmail.com" data-ign="NovaQueen">👑 NovaQueen</button>
+                  <button type="button" class="quick-pick-btn" data-email="cosmicace@gmail.com" data-ign="CosmicAce">🚀 CosmicAce</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- PLAYER READY CARD (Shown when player IS logged in) -->
+            <div id="start-player-ready" class="player-ready-section hidden">
+              <div class="player-profile-box">
+                <div id="ready-avatar" class="ready-avatar">G</div>
+                <div class="ready-info">
+                  <div class="ready-welcome">Welcome, <strong id="ready-ign">Player</strong>!</div>
+                  <div id="ready-email" class="ready-email">player@gmail.com</div>
+                </div>
+                <div class="ready-stats-mini">
+                  <div class="ready-stat"><span class="stat-lbl">Best Score:</span> <strong id="ready-best">0</strong></div>
+                  <div class="ready-stat"><span class="stat-lbl">Rank:</span> <strong id="ready-rank" class="rank-highlight">#--</strong></div>
+                </div>
+              </div>
+
+              <div class="btn-group">
+                <button id="btn-start" class="btn btn-primary" type="button">
+                  <span>Start Game</span>
+                  <svg class="btn-arrow" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                    <path fill="currentColor" d="M8 5v14l11-7z"/>
+                  </svg>
+                </button>
+                <button id="btn-start-leaderboard" class="btn btn-secondary" type="button">
+                  <span>🏆 Leaderboard</span>
+                </button>
+              </div>
+              <button id="btn-switch-player" class="btn-text-switch" type="button">Switch Player / Log Out</button>
+              <p class="shortcut-tip"><kbd>Space</kbd> or tap to begin</p>
+            </div>
+
             <div class="star-preview-row" aria-hidden="true">
               <div class="preview-item">
                 <span class="preview-star star-normal">⭐</span>
@@ -145,14 +206,6 @@
                 <span class="preview-pts">+5 pts</span>
               </div>
             </div>
-
-            <button id="btn-start" class="btn btn-primary" type="button">
-              <span>Start Game</span>
-              <svg class="btn-arrow" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                <path fill="currentColor" d="M8 5v14l11-7z"/>
-              </svg>
-            </button>
-            <p class="shortcut-tip"><kbd>Space</kbd> or tap to begin</p>
           </div>
         </div>
 
@@ -192,6 +245,10 @@
                 ✨ New Best Score! ✨
               </div>
 
+              <div id="go-rank-banner" class="go-rank-banner">
+                🏆 Leaderboard Rank: <strong id="final-rank">#1</strong>
+              </div>
+
               <div class="summary-stats-grid">
                 <div class="stat-pill">
                   <span class="stat-label">Best Score</span>
@@ -216,8 +273,11 @@
               <button id="btn-play-again" class="btn btn-primary" type="button">
                 <span>Play Again</span>
               </button>
+              <button id="btn-gameover-leaderboard" class="btn btn-secondary" type="button">
+                <span>🏆 Leaderboard</span>
+              </button>
               <button id="btn-back-home" class="btn btn-secondary" type="button">
-                <span>Back to Home</span>
+                <span>Home</span>
               </button>
             </div>
             <p class="shortcut-tip">Press <kbd>Space</kbd> to play again</p>
@@ -364,6 +424,47 @@
             </div>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COSMIC LEADERBOARD MODAL -->
+  <div id="modal-leaderboard" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="leaderboard-title">
+    <div class="modal-content leaderboard-modal">
+      <div class="modal-header">
+        <div class="leaderboard-title-group">
+          <span class="modal-header-icon" aria-hidden="true">🏆</span>
+          <h2 id="leaderboard-title" class="modal-title">Galactic Leaderboard</h2>
+        </div>
+        <button id="btn-close-leaderboard" class="modal-close-btn" type="button" aria-label="Close leaderboard">×</button>
+      </div>
+
+      <div class="modal-body leaderboard-body">
+        <p class="auth-desc">Top celestial star catchers ranked by all-time highest score.</p>
+
+        <!-- Top 3 Podium Highlights -->
+        <div id="leaderboard-podium" class="podium-row" aria-hidden="true"></div>
+
+        <!-- Full Rankings Table -->
+        <div class="leaderboard-table-container">
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th class="th-rank">Rank</th>
+                <th class="th-player">Player (IGN)</th>
+                <th class="th-score">Score</th>
+                <th class="th-time">Survived</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-tbody">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="btn-leaderboard-close-btn" class="btn btn-primary" type="button">Close</button>
       </div>
     </div>
   </div>

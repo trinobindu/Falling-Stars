@@ -15,16 +15,31 @@ const MIME_TYPES = {
 };
 
 const server = http.createServer((req, res) => {
-  // Parse clean path without query params
-  const reqUrl = req.url.split('?')[0];
-  const safePath = path.normalize(reqUrl).replace(/^(\.\.[\/\\])+/, '');
-  let filePath = path.join(__dirname, safePath === '/' ? 'index.html' : safePath);
+  let reqPath = req.url.split('?')[0];
+  if (reqPath === '/' || reqPath === '') {
+    reqPath = '/index.html';
+  }
+
+  // Prevent directory traversal
+  const safeRelPath = reqPath.replace(/^\/+/, '');
+  let filePath = path.resolve(__dirname, safeRelPath);
+
+  // If path resolves outside workspace, reject
+  if (!filePath.startsWith(__dirname)) {
+    res.writeHead(403, { 'Content-Type': 'text/plain' });
+    res.end('403 Forbidden');
+    return;
+  }
 
   fs.stat(filePath, (err, stats) => {
-    if (err || !stats.isFile()) {
+    if (err) {
       res.writeHead(404, { 'Content-Type': 'text/plain' });
-      res.end('404 Not Found');
+      res.end('404 Not Found: ' + reqPath);
       return;
+    }
+
+    if (stats.isDirectory()) {
+      filePath = path.join(filePath, 'index.html');
     }
 
     const ext = path.extname(filePath).toLowerCase();
@@ -32,16 +47,19 @@ const server = http.createServer((req, res) => {
 
     fs.readFile(filePath, (readErr, content) => {
       if (readErr) {
-        res.writeHead(500, { 'Content-Type': 'text/plain' });
-        res.end('500 Internal Server Error');
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('404 Not Found');
       } else {
-        res.writeHead(200, { 'Content-Type': contentType });
+        res.writeHead(200, {
+          'Content-Type': contentType,
+          'Access-Control-Allow-Origin': '*'
+        });
         res.end(content);
       }
     });
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`Catch the Stars web server active at http://localhost:${PORT}/`);
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Catch the Stars server running at http://localhost:${PORT}/`);
 });
