@@ -56,6 +56,7 @@
             <span id="user-name" class="user-name">User</span>
             <span id="user-email" class="user-email">user@gmail.com</span>
           </div>
+          <button id="btn-header-edit-ign" class="edit-ign-mini-btn" type="button" title="Change In-Game Name" aria-label="Change In-Game Name">✏️</button>
           <button id="btn-signout" class="signout-btn" type="button" title="Sign Out of Gmail">Sign Out</button>
         </div>
 
@@ -197,7 +198,12 @@
               <div class="player-profile-box">
                 <div id="ready-avatar" class="ready-avatar">G</div>
                 <div class="ready-info">
-                  <div class="ready-welcome">Welcome, <strong id="ready-ign">Player</strong>!</div>
+                  <div class="ready-welcome-line">
+                    <div class="ready-welcome">Welcome, <strong id="ready-ign">Player</strong>!</div>
+                    <button id="btn-open-change-ign" class="btn-change-ign-pill" type="button" title="Change your In-Game Name">
+                      <span aria-hidden="true">✏️</span> Change Name
+                    </button>
+                  </div>
                   <div id="ready-email" class="ready-email">player@gmail.com</div>
                 </div>
                 <div class="ready-stats-mini">
@@ -452,6 +458,57 @@
             </div>
           </button>
         </div>
+      </div>
+    </div>
+  <!-- CHANGE IN-GAME NAME MODAL -->
+  <div id="modal-change-ign" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="change-ign-title">
+    <div class="modal-content auth-modal">
+      <div class="modal-header">
+        <div class="auth-title-group">
+          <span class="modal-header-icon" aria-hidden="true">✏️</span>
+          <div>
+            <h2 id="change-ign-title" class="modal-title">Change In-Game Name</h2>
+            <p class="auth-subtitle">Update your alias in the arena &amp; leaderboard</p>
+          </div>
+        </div>
+        <button id="btn-close-change-ign" class="modal-close-btn" type="button" aria-label="Close name change dialog">×</button>
+      </div>
+
+      <div class="modal-body auth-body">
+        <div id="change-ign-alert" class="auth-alert hidden" role="alert"></div>
+
+        <form id="form-change-ign" class="auth-form" novalidate>
+          <div class="form-group">
+            <label for="input-new-ign" class="form-label">
+              <span>New In-Game Name</span>
+              <span class="form-required">*</span>
+            </label>
+            <div class="input-wrapper">
+              <span class="input-icon" aria-hidden="true">👤</span>
+              <input
+                type="text"
+                id="input-new-ign"
+                class="form-input"
+                placeholder="e.g. StarLord, CosmicAce"
+                minlength="2"
+                maxlength="16"
+                required
+                autocomplete="off"
+              />
+            </div>
+            <span class="form-help">Must be 2 to 16 characters. Unique across all players.</span>
+          </div>
+
+          <div class="btn-group" style="margin-top: 14px;">
+            <button type="submit" id="btn-submit-change-ign" class="btn btn-primary">
+              <span id="btn-change-ign-text">Save New Name</span>
+              <span id="btn-change-ign-spinner" class="auth-spinner hidden" aria-hidden="true"></span>
+            </button>
+            <button type="button" id="btn-cancel-change-ign" class="btn btn-secondary">
+              <span>Cancel</span>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

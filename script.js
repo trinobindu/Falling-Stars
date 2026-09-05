@@ -215,7 +215,20 @@
     readyBest: document.getElementById('ready-best'),
     readyRank: document.getElementById('ready-rank'),
     btnSwitchPlayer: document.getElementById('btn-switch-player'),
-    startDesc: document.getElementById('start-desc')
+    startDesc: document.getElementById('start-desc'),
+
+    // Change In-Game Name Modal & Controls
+    btnHeaderEditIgn: document.getElementById('btn-header-edit-ign'),
+    btnOpenChangeIgn: document.getElementById('btn-open-change-ign'),
+    modalChangeIgn: document.getElementById('modal-change-ign'),
+    btnCloseChangeIgn: document.getElementById('btn-close-change-ign'),
+    btnCancelChangeIgn: document.getElementById('btn-cancel-change-ign'),
+    formChangeIgn: document.getElementById('form-change-ign'),
+    inputNewIgn: document.getElementById('input-new-ign'),
+    changeIgnAlert: document.getElementById('change-ign-alert'),
+    btnSubmitChangeIgn: document.getElementById('btn-submit-change-ign'),
+    btnChangeIgnText: document.getElementById('btn-change-ign-text'),
+    btnChangeIgnSpinner: document.getElementById('btn-change-ign-spinner')
   };
 
   /* ==========================================================================
@@ -727,6 +740,20 @@
         }
       } catch (e) {}
       return null;
+    },
+
+    async changeIgn(email, newIgn) {
+      try {
+        const res = await fetch('/api/player/change-ign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, newIgn })
+        });
+        const data = await res.json();
+        return { ok: res.ok, status: res.status, data };
+      } catch (e) {
+        return { ok: false, data: { error: 'Unable to connect to server. Please ensure server is running.' } };
+      }
     }
   };
 
@@ -989,6 +1016,120 @@
   function closeGoogleModal() {
     soundEngine.uiClick();
     DOM.modalGoogle.classList.add('hidden');
+  }
+
+  /* ==========================================================================
+     CHANGE IN-GAME NAME (IGN) MODAL & CONTROLS
+     ========================================================================== */
+  function openChangeIgnModal() {
+    if (!state.currentUser) return;
+    soundEngine.init();
+    soundEngine.uiClick();
+
+    if (state.isRunning && !state.isPaused) {
+      pauseGame();
+    }
+
+    if (DOM.changeIgnAlert) {
+      DOM.changeIgnAlert.classList.add('hidden');
+      DOM.changeIgnAlert.textContent = '';
+      DOM.changeIgnAlert.className = 'auth-alert hidden';
+    }
+
+    if (DOM.inputNewIgn) {
+      DOM.inputNewIgn.value = state.currentUser.ign || '';
+    }
+
+    if (DOM.btnSubmitChangeIgn) {
+      DOM.btnSubmitChangeIgn.disabled = false;
+    }
+    if (DOM.btnChangeIgnText) {
+      DOM.btnChangeIgnText.textContent = 'Save New Name';
+    }
+    if (DOM.btnChangeIgnSpinner) {
+      DOM.btnChangeIgnSpinner.classList.add('hidden');
+    }
+
+    if (DOM.modalChangeIgn) {
+      DOM.modalChangeIgn.classList.remove('hidden');
+    }
+
+    setTimeout(() => {
+      if (DOM.inputNewIgn) {
+        DOM.inputNewIgn.focus();
+        DOM.inputNewIgn.select();
+      }
+    }, 50);
+  }
+
+  function closeChangeIgnModal() {
+    soundEngine.uiClick();
+    if (DOM.modalChangeIgn) {
+      DOM.modalChangeIgn.classList.add('hidden');
+    }
+    if (DOM.changeIgnAlert) {
+      DOM.changeIgnAlert.classList.add('hidden');
+      DOM.changeIgnAlert.textContent = '';
+    }
+  }
+
+  function showChangeIgnAlert(msg, isSuccess = false) {
+    if (!DOM.changeIgnAlert) return;
+    DOM.changeIgnAlert.textContent = msg;
+    DOM.changeIgnAlert.className = `auth-alert ${isSuccess ? 'success' : 'error'}`;
+    DOM.changeIgnAlert.classList.remove('hidden');
+  }
+
+  async function handleChangeIgnSubmit(e) {
+    e.preventDefault();
+    if (!state.currentUser) return;
+
+    const newIgn = (DOM.inputNewIgn ? DOM.inputNewIgn.value : '').trim();
+
+    if (!newIgn || newIgn.length < 2 || newIgn.length > 16) {
+      showChangeIgnAlert('In-Game Name must be between 2 and 16 characters.', false);
+      if (DOM.inputNewIgn) DOM.inputNewIgn.focus();
+      return;
+    }
+
+    // If identical to current IGN, just close
+    if (newIgn === state.currentUser.ign) {
+      closeChangeIgnModal();
+      return;
+    }
+
+    // Set loading state
+    if (DOM.btnSubmitChangeIgn) DOM.btnSubmitChangeIgn.disabled = true;
+    if (DOM.btnChangeIgnText) DOM.btnChangeIgnText.textContent = 'Saving...';
+    if (DOM.btnChangeIgnSpinner) DOM.btnChangeIgnSpinner.classList.remove('hidden');
+
+    const res = await API.changeIgn(state.currentUser.email, newIgn);
+
+    if (DOM.btnSubmitChangeIgn) DOM.btnSubmitChangeIgn.disabled = false;
+    if (DOM.btnChangeIgnText) DOM.btnChangeIgnText.textContent = 'Save New Name';
+    if (DOM.btnChangeIgnSpinner) DOM.btnChangeIgnSpinner.classList.add('hidden');
+
+    if (!res.ok) {
+      showChangeIgnAlert(res.data && res.data.error ? res.data.error : 'Failed to update name.', false);
+      if (DOM.inputNewIgn) DOM.inputNewIgn.focus();
+      return;
+    }
+
+    // Success! Update local state
+    state.currentUser.ign = res.data.user.ign;
+    try {
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(state.currentUser));
+    } catch (err) {}
+
+    // Update displays
+    applyUserSession(state.currentUser);
+    renderLeaderboard();
+    soundEngine.starCatch('golden');
+
+    showChangeIgnAlert(`Name successfully changed to "${res.data.user.ign}"!`, true);
+    setTimeout(() => {
+      closeChangeIgnModal();
+    }, 700);
   }
 
   // Initialize official Google Identity Services if available and configured
@@ -1441,6 +1582,30 @@
       DOM.btnSwitchPlayer.addEventListener('click', signOutUser);
     }
 
+    // Change In-Game Name triggers
+    if (DOM.btnOpenChangeIgn) {
+      DOM.btnOpenChangeIgn.addEventListener('click', openChangeIgnModal);
+    }
+    if (DOM.btnHeaderEditIgn) {
+      DOM.btnHeaderEditIgn.addEventListener('click', openChangeIgnModal);
+    }
+    if (DOM.btnCloseChangeIgn) {
+      DOM.btnCloseChangeIgn.addEventListener('click', closeChangeIgnModal);
+    }
+    if (DOM.btnCancelChangeIgn) {
+      DOM.btnCancelChangeIgn.addEventListener('click', closeChangeIgnModal);
+    }
+    if (DOM.formChangeIgn) {
+      DOM.formChangeIgn.addEventListener('submit', handleChangeIgnSubmit);
+    }
+    if (DOM.modalChangeIgn) {
+      DOM.modalChangeIgn.addEventListener('click', (e) => {
+        if (e.target === DOM.modalChangeIgn) {
+          closeChangeIgnModal();
+        }
+      });
+    }
+
     // Leaderboard trigger buttons
     if (DOM.btnLeaderboardNav) {
       DOM.btnLeaderboardNav.addEventListener('click', openLeaderboard);
@@ -1516,6 +1681,13 @@
     // Global Keyboard Shortcuts
     window.addEventListener('keydown', (e) => {
       // Modal escape close handlers
+      if (DOM.modalChangeIgn && !DOM.modalChangeIgn.classList.contains('hidden')) {
+        if (e.key === 'Escape') {
+          closeChangeIgnModal();
+        }
+        return;
+      }
+
       if (DOM.modalLeaderboard && !DOM.modalLeaderboard.classList.contains('hidden')) {
         if (e.key === 'Escape') {
           closeLeaderboard();
