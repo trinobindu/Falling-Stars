@@ -228,7 +228,8 @@
     changeIgnAlert: document.getElementById('change-ign-alert'),
     btnSubmitChangeIgn: document.getElementById('btn-submit-change-ign'),
     btnChangeIgnText: document.getElementById('btn-change-ign-text'),
-    btnChangeIgnSpinner: document.getElementById('btn-change-ign-spinner')
+    btnChangeIgnSpinner: document.getElementById('btn-change-ign-spinner'),
+    btnGateLeaderboard: document.getElementById('btn-gate-leaderboard')
   };
 
   /* ==========================================================================
@@ -682,11 +683,14 @@
   const SOUND_STORAGE_KEY = 'catchTheStars_soundEnabled';
   const LEADERBOARD_STORAGE_KEY = 'catchTheStars_cosmicLeaderboard';
 
+  // API Base: Supports both http://localhost:8080 and direct file:/// launches
+  const API_BASE = (window.location.protocol === 'http:' || window.location.protocol === 'https:') ? '' : 'http://localhost:8080';
+
   // Server API client helpers
   const API = {
     async signup(email, password, ign) {
       try {
-        const res = await fetch('/api/auth/signup', {
+        const res = await fetch(`${API_BASE}/api/auth/signup`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password, ign })
@@ -700,7 +704,7 @@
 
     async login(email, password) {
       try {
-        const res = await fetch('/api/auth/login', {
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
@@ -714,7 +718,7 @@
 
     async getLeaderboard() {
       try {
-        const res = await fetch('/api/leaderboard');
+        const res = await fetch(`${API_BASE}/api/leaderboard`);
         if (res.ok) {
           const data = await res.json();
           return data.leaderboard || [];
@@ -730,7 +734,7 @@
 
     async recordScore(email, score, timeSurvived) {
       try {
-        const res = await fetch('/api/score', {
+        const res = await fetch(`${API_BASE}/api/score`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, score, timeSurvived })
@@ -744,7 +748,7 @@
 
     async changeIgn(email, newIgn) {
       try {
-        const res = await fetch('/api/player/change-ign', {
+        const res = await fetch(`${API_BASE}/api/player/change-ign`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, newIgn })
@@ -1609,6 +1613,9 @@
     // Leaderboard trigger buttons
     if (DOM.btnLeaderboardNav) {
       DOM.btnLeaderboardNav.addEventListener('click', openLeaderboard);
+    }
+    if (DOM.btnGateLeaderboard) {
+      DOM.btnGateLeaderboard.addEventListener('click', openLeaderboard);
     }
     if (DOM.btnStartLeaderboard) {
       DOM.btnStartLeaderboard.addEventListener('click', openLeaderboard);
