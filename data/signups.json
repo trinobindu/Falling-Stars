@@ -1,0 +1,26 @@
+{
+  "totalSignups": 2,
+  "lastUpdated": "2026-09-05T13:55:53.237Z",
+  "players": [
+    {
+      "id": "usr_1788616553024_d2zd1",
+      "email": "player1@gmail.com",
+      "ign": "GalaxyHunter",
+      "signupDate": "2026-09-05T13:55:53.024Z",
+      "highestScore": 45,
+      "timeSurvived": "1:30",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-05T13:55:53.220Z"
+    },
+    {
+      "id": "usr_1788616553102_fx106",
+      "email": "player2@gmail.com",
+      "ign": "NovaQueen",
+      "signupDate": "2026-09-05T13:55:53.102Z",
+      "highestScore": 70,
+      "timeSurvived": "2:15",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-05T13:55:53.102Z"
+    }
+  ]
+}

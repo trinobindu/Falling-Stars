@@ -135,32 +135,61 @@
               Endless Cosmic Survival! Catch falling stars before 5 escape.
             </p>
 
-            <!-- MANDATORY LOGIN GATE (Shown when player is NOT logged in) -->
+            <!-- MANDATORY LOGIN GATE (Sign Up & Log In with Password) -->
             <div id="start-gate-login" class="gate-login-section">
-              <div class="gate-badge">🔒 Login Required to Play</div>
-              <form id="form-gate-login" class="gate-form" onsubmit="return false;">
+              <div class="auth-tabs" role="tablist">
+                <button type="button" id="tab-btn-signup" class="auth-tab active" role="tab" aria-selected="true">
+                  <span>Sign Up (New)</span>
+                </button>
+                <button type="button" id="tab-btn-login" class="auth-tab" role="tab" aria-selected="false">
+                  <span>Log In (Returning)</span>
+                </button>
+              </div>
+
+              <!-- Inline Alert Notification -->
+              <div id="auth-alert" class="auth-alert hidden" role="alert"></div>
+
+              <!-- FORM 1: SIGN UP (Gmail + IGN + Password) -->
+              <form id="form-signup" class="gate-form" onsubmit="return false;">
                 <div class="form-field">
-                  <label for="gate-ign" class="field-label">Choose In-Game Name (IGN):</label>
-                  <input type="text" id="gate-ign" class="auth-input" placeholder="e.g. StarLord, CosmicAce" maxlength="16" required>
+                  <label for="signup-gmail" class="field-label">Gmail Address:</label>
+                  <input type="email" id="signup-gmail" class="auth-input" placeholder="player@gmail.com" required autocomplete="email">
                 </div>
                 <div class="form-field">
-                  <label for="gate-gmail" class="field-label">Your Gmail Address:</label>
-                  <input type="email" id="gate-gmail" class="auth-input" placeholder="player@gmail.com" required>
+                  <label for="signup-ign" class="field-label">Choose In-Game Name (IGN):</label>
+                  <input type="text" id="signup-ign" class="auth-input" placeholder="e.g. StarLord (2-16 chars)" maxlength="16" minlength="2" required autocomplete="username">
                 </div>
-                <button type="submit" id="btn-gate-submit" class="btn btn-primary w-full">
-                  <span>Enter Arena &amp; Play</span>
+                <div class="form-field">
+                  <label for="signup-password" class="field-label">Create Password:</label>
+                  <div class="pwd-input-wrap">
+                    <input type="password" id="signup-password" class="auth-input pwd-input" placeholder="Min 4 characters" minlength="4" required autocomplete="new-password">
+                    <button type="button" id="btn-toggle-signup-pwd" class="pwd-toggle-btn" title="Show/Hide Password" aria-label="Toggle password visibility">👁️</button>
+                  </div>
+                </div>
+                <button type="submit" id="btn-signup-submit" class="btn btn-primary w-full">
+                  <span>Create Account &amp; Play</span>
                   <span aria-hidden="true">🚀</span>
                 </button>
               </form>
 
-              <div class="quick-pick-section">
-                <span class="quick-pick-title">Or 1-Click Quick Select:</span>
-                <div class="quick-pick-row">
-                  <button type="button" class="quick-pick-btn" data-email="starlord@gmail.com" data-ign="StarLord">⭐ StarLord</button>
-                  <button type="button" class="quick-pick-btn" data-email="novaqueen@gmail.com" data-ign="NovaQueen">👑 NovaQueen</button>
-                  <button type="button" class="quick-pick-btn" data-email="cosmicace@gmail.com" data-ign="CosmicAce">🚀 CosmicAce</button>
+              <!-- FORM 2: LOG IN (Gmail + Password) -->
+              <form id="form-login" class="gate-form hidden" onsubmit="return false;">
+                <div class="form-field">
+                  <label for="login-gmail" class="field-label">Gmail Address:</label>
+                  <input type="email" id="login-gmail" class="auth-input" placeholder="player@gmail.com" required autocomplete="email">
                 </div>
-              </div>
+                <div class="form-field">
+                  <label for="login-password" class="field-label">Password:</label>
+                  <div class="pwd-input-wrap">
+                    <input type="password" id="login-password" class="auth-input pwd-input" placeholder="Enter your password" required autocomplete="current-password">
+                    <button type="button" id="btn-toggle-login-pwd" class="pwd-toggle-btn" title="Show/Hide Password" aria-label="Toggle password visibility">👁️</button>
+                  </div>
+                </div>
+                <button type="submit" id="btn-login-submit" class="btn btn-primary w-full">
+                  <span>Log In &amp; Continue Game</span>
+                  <span aria-hidden="true">🔑</span>
+                </button>
+              </form>
             </div>
 
             <!-- PLAYER READY CARD (Shown when player IS logged in) -->
@@ -434,7 +463,10 @@
       <div class="modal-header">
         <div class="leaderboard-title-group">
           <span class="modal-header-icon" aria-hidden="true">🏆</span>
-          <h2 id="leaderboard-title" class="modal-title">Galactic Leaderboard</h2>
+          <div>
+            <h2 id="leaderboard-title" class="modal-title">Galactic Leaderboard</h2>
+            <span id="lb-player-count" class="lb-player-count">Real Players Only</span>
+          </div>
         </div>
         <button id="btn-close-leaderboard" class="modal-close-btn" type="button" aria-label="Close leaderboard">×</button>
       </div>
@@ -445,8 +477,15 @@
         <!-- Top 3 Podium Highlights -->
         <div id="leaderboard-podium" class="podium-row" aria-hidden="true"></div>
 
+        <!-- Empty state when no players have played yet -->
+        <div id="leaderboard-empty" class="leaderboard-empty hidden">
+          <span class="empty-icon">🌌</span>
+          <p class="empty-title">The Cosmos is Waiting</p>
+          <p class="empty-subtitle">No real players have set a score yet. Be the first to claim #1!</p>
+        </div>
+
         <!-- Full Rankings Table -->
-        <div class="leaderboard-table-container">
+        <div id="leaderboard-table-container" class="leaderboard-table-container">
           <table class="leaderboard-table">
             <thead>
               <tr>

@@ -182,16 +182,31 @@
     btnLeaderboardCloseBtn: document.getElementById('btn-leaderboard-close-btn'),
     leaderboardTbody: document.getElementById('leaderboard-tbody'),
     leaderboardPodium: document.getElementById('leaderboard-podium'),
+    leaderboardEmpty: document.getElementById('leaderboard-empty'),
+    leaderboardTableContainer: document.getElementById('leaderboard-table-container'),
+    lbPlayerCount: document.getElementById('lb-player-count'),
     btnStartLeaderboard: document.getElementById('btn-start-leaderboard'),
     btnGameoverLeaderboard: document.getElementById('btn-gameover-leaderboard'),
     finalRank: document.getElementById('final-rank'),
 
-    // Start Screen Adaptive Cards
+    // Start Screen Auth Gate (Sign Up & Log In with Password)
     startGateLogin: document.getElementById('start-gate-login'),
-    formGateLogin: document.getElementById('form-gate-login'),
-    gateIgn: document.getElementById('gate-ign'),
-    gateGmail: document.getElementById('gate-gmail'),
-    quickPickBtns: document.querySelectorAll('.quick-pick-btn'),
+    tabBtnSignup: document.getElementById('tab-btn-signup'),
+    tabBtnLogin: document.getElementById('tab-btn-login'),
+    authAlert: document.getElementById('auth-alert'),
+    formSignup: document.getElementById('form-signup'),
+    signupGmail: document.getElementById('signup-gmail'),
+    signupIgn: document.getElementById('signup-ign'),
+    signupPassword: document.getElementById('signup-password'),
+    btnToggleSignupPwd: document.getElementById('btn-toggle-signup-pwd'),
+    btnSignupSubmit: document.getElementById('btn-signup-submit'),
+    formLogin: document.getElementById('form-login'),
+    loginGmail: document.getElementById('login-gmail'),
+    loginPassword: document.getElementById('login-password'),
+    btnToggleLoginPwd: document.getElementById('btn-toggle-login-pwd'),
+    btnLoginSubmit: document.getElementById('btn-login-submit'),
+
+    // Player Ready Card
     startPlayerReady: document.getElementById('start-player-ready'),
     readyAvatar: document.getElementById('ready-avatar'),
     readyIgn: document.getElementById('ready-ign'),
@@ -646,19 +661,72 @@
   }
 
   /* ==========================================================================
-     9. HIGH SCORE, GMAIL AUTHENTICATION & COSMIC LEADERBOARD
+     9. SERVER API, PASSWORD AUTHENTICATION & REAL-PLAYER LEADERBOARD
      ========================================================================== */
   const USER_STORAGE_KEY = 'catchTheStars_userProfile';
   const SOUND_STORAGE_KEY = 'catchTheStars_soundEnabled';
   const LEADERBOARD_STORAGE_KEY = 'catchTheStars_cosmicLeaderboard';
 
-  const DEFAULT_LEADERBOARD = [
-    { ign: 'NovaQueen', email: 'novaqueen@gmail.com', score: 85, time: '3:45', date: 'Elite' },
-    { ign: 'CosmicAce', email: 'cosmicace@gmail.com', score: 68, time: '2:50', date: 'Master' },
-    { ign: 'StarLord', email: 'starlord@gmail.com', score: 52, time: '2:15', date: 'Veteran' },
-    { ign: 'AstroKid', email: 'astro@gmail.com', score: 36, time: '1:30', date: 'Cadet' },
-    { ign: 'OrbitSeeker', email: 'orbit@gmail.com', score: 24, time: '1:05', date: 'Rookie' }
-  ];
+  // Server API client helpers
+  const API = {
+    async signup(email, password, ign) {
+      try {
+        const res = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, ign })
+        });
+        const data = await res.json();
+        return { ok: res.ok, status: res.status, data };
+      } catch (e) {
+        return { ok: false, data: { error: 'Unable to connect to server. Please ensure server is running.' } };
+      }
+    },
+
+    async login(email, password) {
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+        return { ok: res.ok, status: res.status, data };
+      } catch (e) {
+        return { ok: false, data: { error: 'Unable to connect to server. Please ensure server is running.' } };
+      }
+    },
+
+    async getLeaderboard() {
+      try {
+        const res = await fetch('/api/leaderboard');
+        if (res.ok) {
+          const data = await res.json();
+          return data.leaderboard || [];
+        }
+      } catch (e) {}
+      // Fallback to local storage if server unreachable
+      try {
+        const saved = localStorage.getItem(LEADERBOARD_STORAGE_KEY);
+        if (saved) return JSON.parse(saved);
+      } catch (e) {}
+      return [];
+    },
+
+    async recordScore(email, score, timeSurvived) {
+      try {
+        const res = await fetch('/api/score', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, score, timeSurvived })
+        });
+        if (res.ok) {
+          return await res.json();
+        }
+      } catch (e) {}
+      return null;
+    }
+  };
 
   // Return unique localStorage key based on current Gmail user
   function getHighScoreKey() {
@@ -671,13 +739,17 @@
 
   // Load high score for the active user profile
   function loadHighScore() {
-    try {
-      const key = getHighScoreKey();
-      const saved = localStorage.getItem(key);
-      const val = parseInt(saved, 10);
-      state.highScore = !isNaN(val) && val >= 0 ? val : 0;
-    } catch (e) {
-      state.highScore = 0;
+    if (state.currentUser && typeof state.currentUser.highestScore === 'number' && state.currentUser.highestScore > 0) {
+      state.highScore = state.currentUser.highestScore;
+    } else {
+      try {
+        const key = getHighScoreKey();
+        const saved = localStorage.getItem(key);
+        const val = parseInt(saved, 10);
+        state.highScore = !isNaN(val) && val >= 0 ? val : 0;
+      } catch (e) {
+        state.highScore = 0;
+      }
     }
     DOM.bestDisplay.textContent = state.highScore;
   }
@@ -687,94 +759,41 @@
     try {
       const key = getHighScoreKey();
       localStorage.setItem(key, score.toString());
+      if (state.currentUser) {
+        state.currentUser.highestScore = score;
+        localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(state.currentUser));
+      }
     } catch (e) {
       console.warn('localStorage not available for high score:', e);
     }
   }
 
-  // Leaderboard storage helpers
-  function loadLeaderboard() {
-    try {
-      const saved = localStorage.getItem(LEADERBOARD_STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          return parsed;
-        }
-      }
-    } catch (e) {
-      console.warn('Leaderboard load error:', e);
-    }
-    return [...DEFAULT_LEADERBOARD];
-  }
-
-  function saveLeaderboard(list) {
-    try {
-      localStorage.setItem(LEADERBOARD_STORAGE_KEY, JSON.stringify(list));
-    } catch (e) {
-      console.warn('Leaderboard save error:', e);
-    }
-  }
-
-  // Record a score for the active player into the leaderboard
-  function recordPlayerScore(score, timeSeconds) {
-    if (!state.currentUser) return '-';
-
-    const board = loadLeaderboard();
-    const playerEmail = state.currentUser.email.toLowerCase();
-    const playerIgn = state.currentUser.ign || state.currentUser.name || 'Star Player';
-    const timeStr = formatTime(timeSeconds);
-
-    let entry = board.find((p) => p.email && p.email.toLowerCase() === playerEmail);
-
-    if (entry) {
-      if (score > entry.score) {
-        entry.score = score;
-        entry.time = timeStr;
-        entry.ign = playerIgn;
-        entry.date = 'Today';
-      }
-    } else {
-      board.push({
-        ign: playerIgn,
-        email: playerEmail,
-        score: score,
-        time: timeStr,
-        date: 'Today'
-      });
-    }
-
-    // Sort descending by score
-    board.sort((a, b) => b.score - a.score);
-
-    // Keep top 25
-    const trimmed = board.slice(0, 25);
-    saveLeaderboard(trimmed);
-
-    // Find rank index (1-indexed)
-    const rankIndex = trimmed.findIndex((p) => p.email && p.email.toLowerCase() === playerEmail);
-    return rankIndex >= 0 ? rankIndex + 1 : '-';
-  }
-
-  // Get current player's rank
-  function getPlayerRank() {
-    if (!state.currentUser) return '-';
-    const board = loadLeaderboard();
-    const playerEmail = state.currentUser.email.toLowerCase();
-    const rankIndex = board.findIndex((p) => p.email && p.email.toLowerCase() === playerEmail);
-    return rankIndex >= 0 ? rankIndex + 1 : '-';
-  }
-
-  // Render leaderboard UI (Podium + Table)
-  function renderLeaderboard() {
-    const board = loadLeaderboard();
+  // Render leaderboard UI (Zero Bots! Strictly real registered players)
+  async function renderLeaderboard() {
+    const board = await API.getLeaderboard();
     const medals = ['🥇', '🥈', '🥉'];
     const currentEmail = state.currentUser ? state.currentUser.email.toLowerCase() : '';
 
-    // Render Podium
+    if (DOM.lbPlayerCount) {
+      DOM.lbPlayerCount.textContent = `${board.length} Real Player${board.length === 1 ? '' : 's'}`;
+    }
+
+    // If 0 players have scored, show friendly empty state
+    if (!board || board.length === 0) {
+      if (DOM.leaderboardEmpty) DOM.leaderboardEmpty.classList.remove('hidden');
+      if (DOM.leaderboardPodium) DOM.leaderboardPodium.innerHTML = '';
+      if (DOM.leaderboardTableContainer) DOM.leaderboardTableContainer.classList.add('hidden');
+      return;
+    }
+
+    if (DOM.leaderboardEmpty) DOM.leaderboardEmpty.classList.add('hidden');
+    if (DOM.leaderboardTableContainer) DOM.leaderboardTableContainer.classList.remove('hidden');
+
+    // Render Podium dynamically for up to 3 real players
     if (DOM.leaderboardPodium) {
+      const podiumCount = Math.min(3, board.length);
       let podiumHtml = '';
-      for (let i = 0; i < Math.min(3, board.length); i++) {
+      for (let i = 0; i < podiumCount; i++) {
         const item = board[i];
         podiumHtml += `
           <div class="podium-card rank-${i + 1}">
@@ -808,6 +827,21 @@
     }
   }
 
+  async function getPlayerRank() {
+    if (!state.currentUser) return '-';
+    const board = await API.getLeaderboard();
+    const playerEmail = state.currentUser.email.toLowerCase();
+    const rankIndex = board.findIndex((p) => p.email && p.email.toLowerCase() === playerEmail);
+    return rankIndex >= 0 ? rankIndex + 1 : '-';
+  }
+
+  async function updateReadyRank() {
+    if (DOM.readyRank && state.currentUser) {
+      const r = await getPlayerRank();
+      DOM.readyRank.textContent = typeof r === 'number' ? `#${r}` : r;
+    }
+  }
+
   function openLeaderboard() {
     soundEngine.init();
     soundEngine.uiClick();
@@ -826,6 +860,20 @@
     DOM.modalLeaderboard.classList.add('hidden');
   }
 
+  // Auth alert messages
+  function showAuthAlert(msg, isError = true) {
+    if (!DOM.authAlert) return;
+    DOM.authAlert.className = `auth-alert ${isError ? 'error' : 'success'}`;
+    DOM.authAlert.textContent = msg;
+    DOM.authAlert.classList.remove('hidden');
+  }
+
+  function clearAuthAlert() {
+    if (!DOM.authAlert) return;
+    DOM.authAlert.className = 'auth-alert hidden';
+    DOM.authAlert.textContent = '';
+  }
+
   // Update Start Screen UI (Login Gate vs Ready Player Card)
   function updateStartScreenUI() {
     if (state.currentUser) {
@@ -836,11 +884,11 @@
       if (DOM.readyEmail) DOM.readyEmail.textContent = state.currentUser.email;
       if (DOM.readyAvatar) DOM.readyAvatar.textContent = (state.currentUser.ign || 'P').charAt(0).toUpperCase();
       if (DOM.readyBest) DOM.readyBest.textContent = state.highScore;
-      if (DOM.readyRank) DOM.readyRank.textContent = '#' + getPlayerRank();
+      updateReadyRank();
     } else {
       if (DOM.startGateLogin) DOM.startGateLogin.classList.remove('hidden');
       if (DOM.startPlayerReady) DOM.startPlayerReady.classList.add('hidden');
-      if (DOM.gateIgn) DOM.gateIgn.value = '';
+      clearAuthAlert();
     }
   }
 
@@ -1022,7 +1070,7 @@
       soundEngine.init();
       soundEngine.uiClick();
       updateStartScreenUI();
-      if (DOM.gateIgn) DOM.gateIgn.focus();
+      if (DOM.signupGmail) DOM.signupGmail.focus();
       return;
     }
 
@@ -1116,7 +1164,7 @@
   }
 
   // End the game session
-  function endGame(reason) {
+  async function endGame(reason) {
     if (!state.isRunning) return;
 
     state.isRunning = false;
@@ -1130,18 +1178,27 @@
     // Hide in-game pause button
     DOM.btnPause.style.display = 'none';
 
-    // Record score into Cosmic Leaderboard
-    const playerRank = recordPlayerScore(state.score, state.elapsedSeconds);
-    if (DOM.finalRank) {
-      DOM.finalRank.textContent = typeof playerRank === 'number' ? `#${playerRank}` : playerRank;
-    }
-
-    // Determine if new best score achieved
+    // Determine if new best score achieved locally
     const isNewHigh = state.score > 0 && state.score >= state.highScore;
     if (state.score > state.highScore) {
       state.highScore = state.score;
       saveHighScore(state.highScore);
       DOM.bestDisplay.textContent = state.highScore;
+    }
+
+    // Record score into server folder & leaderboard
+    if (state.currentUser) {
+      const timeStr = formatTime(state.elapsedSeconds);
+      const res = await API.recordScore(state.currentUser.email, state.score, timeStr);
+      if (res && res.rank) {
+        if (DOM.finalRank) DOM.finalRank.textContent = `#${res.rank}`;
+        if (DOM.readyRank) DOM.readyRank.textContent = `#${res.rank}`;
+      } else {
+        const localRank = await getPlayerRank();
+        if (DOM.finalRank) DOM.finalRank.textContent = typeof localRank === 'number' ? `#${localRank}` : localRank;
+      }
+    } else {
+      if (DOM.finalRank) DOM.finalRank.textContent = '-';
     }
 
     // Play game over tone
@@ -1251,38 +1308,123 @@
       }
     });
 
-    // Start screen mandatory login gate form
-    if (DOM.formGateLogin) {
-      DOM.formGateLogin.addEventListener('submit', (e) => {
+    // Tab switching (Sign Up vs Log In)
+    if (DOM.tabBtnSignup && DOM.tabBtnLogin) {
+      DOM.tabBtnSignup.addEventListener('click', () => {
+        soundEngine.init();
+        soundEngine.uiClick();
+        DOM.tabBtnSignup.classList.add('active');
+        DOM.tabBtnSignup.setAttribute('aria-selected', 'true');
+        DOM.tabBtnLogin.classList.remove('active');
+        DOM.tabBtnLogin.setAttribute('aria-selected', 'false');
+        if (DOM.formSignup) DOM.formSignup.classList.remove('hidden');
+        if (DOM.formLogin) DOM.formLogin.classList.add('hidden');
+        clearAuthAlert();
+      });
+
+      DOM.tabBtnLogin.addEventListener('click', () => {
+        soundEngine.init();
+        soundEngine.uiClick();
+        DOM.tabBtnLogin.classList.add('active');
+        DOM.tabBtnLogin.setAttribute('aria-selected', 'true');
+        DOM.tabBtnSignup.classList.remove('active');
+        DOM.tabBtnSignup.setAttribute('aria-selected', 'false');
+        if (DOM.formLogin) DOM.formLogin.classList.remove('hidden');
+        if (DOM.formSignup) DOM.formSignup.classList.add('hidden');
+        clearAuthAlert();
+      });
+    }
+
+    // Password visibility toggles
+    if (DOM.btnToggleSignupPwd && DOM.signupPassword) {
+      DOM.btnToggleSignupPwd.addEventListener('click', () => {
+        soundEngine.init();
+        soundEngine.uiClick();
+        const type = DOM.signupPassword.type === 'password' ? 'text' : 'password';
+        DOM.signupPassword.type = type;
+        DOM.btnToggleSignupPwd.textContent = type === 'password' ? '👁️' : '🙈';
+      });
+    }
+
+    if (DOM.btnToggleLoginPwd && DOM.loginPassword) {
+      DOM.btnToggleLoginPwd.addEventListener('click', () => {
+        soundEngine.init();
+        soundEngine.uiClick();
+        const type = DOM.loginPassword.type === 'password' ? 'text' : 'password';
+        DOM.loginPassword.type = type;
+        DOM.btnToggleLoginPwd.textContent = type === 'password' ? '👁️' : '🙈';
+      });
+    }
+
+    // Sign Up form submission
+    if (DOM.formSignup) {
+      DOM.formSignup.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const ign = (DOM.gateIgn.value || '').trim();
-        const email = (DOM.gateGmail.value || '').trim();
-        if (ign && email) {
-          signInUser({
-            ign: ign,
-            name: ign,
-            email: email,
-            avatar: null
-          });
+        soundEngine.init();
+        clearAuthAlert();
+
+        const email = (DOM.signupGmail.value || '').trim();
+        const ign = (DOM.signupIgn.value || '').trim();
+        const password = (DOM.signupPassword.value || '').trim();
+
+        if (!email || !ign || !password) {
+          showAuthAlert('Please fill in your Gmail, In-Game Name, and Password.');
+          return;
+        }
+
+        if (password.length < 4) {
+          showAuthAlert('Password must be at least 4 characters long.');
+          return;
+        }
+
+        DOM.btnSignupSubmit.disabled = true;
+        DOM.btnSignupSubmit.textContent = 'Registering Account...';
+
+        const res = await API.signup(email, password, ign);
+        DOM.btnSignupSubmit.disabled = false;
+        DOM.btnSignupSubmit.innerHTML = '<span>Create Account &amp; Play</span><span aria-hidden="true">🚀</span>';
+
+        if (res.ok && res.data.user) {
+          showAuthAlert('Account created successfully! Welcome aboard 🚀', false);
+          setTimeout(() => {
+            signInUser(res.data.user);
+          }, 350);
+        } else {
+          showAuthAlert((res.data && res.data.error) || 'Failed to create account. Please check details and try again.');
         }
       });
     }
 
-    // Quick-pick identity buttons in start gate
-    if (DOM.quickPickBtns) {
-      DOM.quickPickBtns.forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const ign = btn.getAttribute('data-ign');
-          const email = btn.getAttribute('data-email');
-          if (ign && email) {
-            signInUser({
-              ign: ign,
-              name: ign,
-              email: email,
-              avatar: null
-            });
-          }
-        });
+    // Log In form submission
+    if (DOM.formLogin) {
+      DOM.formLogin.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        soundEngine.init();
+        clearAuthAlert();
+
+        const email = (DOM.loginGmail.value || '').trim();
+        const password = (DOM.loginPassword.value || '').trim();
+
+        if (!email || !password) {
+          showAuthAlert('Please enter both your Gmail and password.');
+          return;
+        }
+
+        DOM.btnLoginSubmit.disabled = true;
+        DOM.btnLoginSubmit.textContent = 'Logging in...';
+
+        const res = await API.login(email, password);
+        DOM.btnLoginSubmit.disabled = false;
+        DOM.btnLoginSubmit.innerHTML = '<span>Log In &amp; Continue Game</span><span aria-hidden="true">🔑</span>';
+
+        if (res.ok && res.data.user) {
+          showAuthAlert(`Welcome back, ${res.data.user.ign}!`, false);
+          setTimeout(() => {
+            signInUser(res.data.user);
+          }, 350);
+        } else {
+          showAuthAlert((res.data && res.data.error) || 'Login failed. Please check your Gmail and password.');
+        }
       });
     }
 
