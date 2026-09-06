@@ -1,6 +1,6 @@
 {
-  "totalSignups": 29,
-  "lastUpdated": "2026-09-06T14:46:56.027Z",
+  "totalSignups": 30,
+  "lastUpdated": "2026-09-06T14:47:02.092Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -19,18 +19,8 @@
       "signupDate": "2026-09-05T14:29:59.477Z",
       "highestScore": 112,
       "timeSurvived": "0:46",
-      "gamesPlayed": 24,
-      "lastLogin": "2026-09-06T14:42:21.823Z"
-    },
-    {
-      "id": "usr_1788705688705_qxmb2",
-      "email": "prithwisinha2@gmail.com",
-      "ign": "Boss",
-      "signupDate": "2026-09-06T14:41:28.705Z",
-      "highestScore": 109,
-      "timeSurvived": "0:34",
-      "gamesPlayed": 3,
-      "lastLogin": "2026-09-06T14:46:32.026Z"
+      "gamesPlayed": 23,
+      "lastLogin": "2026-09-06T14:46:16.937Z"
     },
     {
       "id": "usr_1788632060759_212we",
@@ -51,6 +41,16 @@
       "timeSurvived": "0:20",
       "gamesPlayed": 2,
       "lastLogin": "2026-09-06T14:24:14.621Z"
+    },
+    {
+      "id": "usr_1788705688705_qxmb2",
+      "email": "prithwisinha2@gmail.com",
+      "ign": "Boss",
+      "signupDate": "2026-09-06T14:41:28.705Z",
+      "highestScore": 88,
+      "timeSurvived": "0:20",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-06T14:41:28.705Z"
     },
     {
       "id": "usr_1788704337385_sfi7u",
@@ -83,14 +83,24 @@
       "lastLogin": "2026-09-05T18:52:43.668Z"
     },
     {
-      "id": "usr_1788705879877_ddswc",
+      "id": "usr_1788705954932_smwaz",
       "email": "ay97948328@gmail.com",
       "ign": "ay97948328@gmail",
-      "signupDate": "2026-09-06T14:44:39.877Z",
+      "signupDate": "2026-09-06T14:45:54.932Z",
       "highestScore": 69,
-      "timeSurvived": "0:20",
-      "gamesPlayed": 3,
-      "lastLogin": "2026-09-06T14:46:53.326Z"
+      "timeSurvived": "0:22",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-06T14:45:54.932Z"
+    },
+    {
+      "id": "usr_1788705894928_54fei",
+      "email": "baapkomatsikha@gmail.com",
+      "ign": "Baaphutera",
+      "signupDate": "2026-09-06T14:44:54.928Z",
+      "highestScore": 56,
+      "timeSurvived": "0:23",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-06T14:45:23.530Z"
     },
     {
       "id": "usr_1788626307212_kk989",
