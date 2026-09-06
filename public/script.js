@@ -964,13 +964,17 @@
         if (!isNaN(s) && s > best) best = s;
       } catch (e) {}
 
-      const res = await API.recordScore(email, best, '0:20', ign, best);
-      if (res && typeof res.highestScore === 'number' && res.highestScore > 0) {
-        if (res.highestScore > state.highScore) {
-          state.highScore = res.highestScore;
-          saveHighScore(state.highScore);
-          if (DOM.bestDisplay) DOM.bestDisplay.textContent = state.highScore;
-          if (DOM.readyBest) DOM.readyBest.textContent = state.highScore;
+      // Only push score if player has an actual score higher than known server score
+      const knownServerScore = typeof user.highestScore === 'number' ? user.highestScore : 0;
+      if (best > 0 && best > knownServerScore) {
+        const res = await API.recordScore(email, best, '0:20', ign, best);
+        if (res && typeof res.highestScore === 'number' && res.highestScore > 0) {
+          if (res.highestScore > state.highScore) {
+            state.highScore = res.highestScore;
+            saveHighScore(state.highScore);
+            if (DOM.bestDisplay) DOM.bestDisplay.textContent = state.highScore;
+            if (DOM.readyBest) DOM.readyBest.textContent = state.highScore;
+          }
         }
       }
       renderLeaderboard();

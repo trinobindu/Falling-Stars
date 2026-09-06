@@ -131,6 +131,7 @@ async function loadAllPlayers() {
     if (ghData && ghData.content) {
       const parsed = JSON.parse(ghData.content);
       if (parsed && Array.isArray(parsed.players) && parsed.players.length > 0) {
+        parsed.players.sort(sortPlayers);
         memoryCache.players = parsed.players;
         memoryCache.timestamp = now;
         writeToLocalFilesystem(parsed.players);
@@ -144,6 +145,7 @@ async function loadAllPlayers() {
       if (rawRes.ok) {
         const rawJson = await rawRes.json();
         if (rawJson && Array.isArray(rawJson.players) && rawJson.players.length > 0) {
+          rawJson.players.sort(sortPlayers);
           memoryCache.players = rawJson.players;
           memoryCache.timestamp = now;
           writeToLocalFilesystem(rawJson.players);
@@ -225,8 +227,36 @@ async function saveAllPlayers(players) {
 }
 
 async function getPlayerByEmail(email) {
-  const players = await loadAllPlayers();
+  if (!email) return null;
   const normalized = (email || '').trim().toLowerCase();
+  const sanitized = normalized.replace(/[^a-z0-9]/g, '_');
+
+  // 1. Check local file or /tmp
+  const localFile = path.join(localPlayersDir, `${sanitized}.json`);
+  if (fs.existsSync(localFile)) {
+    try {
+      const p = JSON.parse(fs.readFileSync(localFile, 'utf8'));
+      if (p && p.email && p.email.toLowerCase() === normalized) return p;
+    } catch (e) {}
+  }
+
+  // 2. Fetch individual player file directly from GitHub API
+  try {
+    const ghFile = await fetchFileFromGitHub(`data/players/${sanitized}.json`);
+    if (ghFile && ghFile.content) {
+      const p = JSON.parse(ghFile.content);
+      if (p && p.email) {
+        try {
+          if (!fs.existsSync(localPlayersDir)) fs.mkdirSync(localPlayersDir, { recursive: true });
+          fs.writeFileSync(localFile, JSON.stringify(p, null, 2), 'utf8');
+        } catch (e) {}
+        return p;
+      }
+    }
+  } catch (e) {}
+
+  // 3. Fallback to loaded signups list
+  const players = await loadAllPlayers();
   return players.find(p => p.email && p.email.toLowerCase() === normalized) || null;
 }
 
@@ -241,9 +271,13 @@ async function savePlayer(player) {
     players.push(player);
   }
 
-  await saveAllPlayers(players);
-  // Commit individual player file to GitHub in background
-  syncToGitHub(player, players).catch(() => {});
+  players.sort(sortPlayers);
+  memoryCache.players = players;
+  memoryCache.timestamp = Date.now();
+  writeToLocalFilesystem(players);
+
+  // Sync to GitHub: commits individual player file AND merges signups.json with automatic 409 retry
+  syncToGitHub(player).catch(err => console.error('Background syncToGitHub error:', err));
   return player;
 }
 

@@ -1,4 +1,4 @@
-const { getPlayerByEmail, savePlayer, verifyPassword, sendJson, parseBody, handleCors } = require('../_lib/storage');
+const { getPlayerByEmail, savePlayer, hashPassword, verifyPassword, sendJson, parseBody, handleCors } = require('../_lib/storage');
 
 module.exports = async function handler(req, res) {
   if (handleCors(req, res)) return;
@@ -25,6 +25,28 @@ module.exports = async function handler(req, res) {
     if (!player) {
       return sendJson(res, 404, {
         error: 'No account found with this Gmail. Please sign up to create your account!'
+      });
+    }
+
+    if (!player.hash || !player.salt) {
+      // Legacy player from before passwords: set password and authenticate seamlessly
+      const { salt, hash } = hashPassword(password);
+      player.salt = salt;
+      player.hash = hash;
+      player.lastLogin = new Date().toISOString();
+      await savePlayer(player);
+
+      return sendJson(res, 200, {
+        success: true,
+        message: 'Welcome back, ' + player.ign + '! Your password has been secured.',
+        user: {
+          id: player.id,
+          email: player.email,
+          ign: player.ign,
+          highestScore: player.highestScore || 0,
+          timeSurvived: player.timeSurvived || '0:00',
+          gamesPlayed: player.gamesPlayed || 0
+        }
       });
     }
 
