@@ -1,6 +1,6 @@
 {
   "totalSignups": 37,
-  "lastUpdated": "2026-09-06T17:44:33.196Z",
+  "lastUpdated": "2026-09-06T17:44:38.010Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -221,6 +221,17 @@
       "lastLogin": "2026-09-05T19:05:16.426Z"
     },
     {
+      "id": "usr_1788712750650_kzl89",
+      "email": "niatidas009@gmail.com",
+      "ign": "Rups",
+      "signupDate": "2026-09-06T16:39:10.650Z",
+      "highestScore": 45,
+      "timeSurvived": "0:24",
+      "gamesPlayed": 9,
+      "lastLogin": "2026-09-06T17:44:33.215Z",
+      "lastActive": "2026-09-06T17:44:33.215Z"
+    },
+    {
       "id": "usr_1788629885886_ctyvn",
       "email": "pde789059@gmail.com",
       "ign": "Purba De",
@@ -290,17 +301,6 @@
       "timeSurvived": "0:18",
       "gamesPlayed": 2,
       "lastLogin": "2026-09-06T14:47:10.518Z"
-    },
-    {
-      "id": "usr_1788712750650_kzl89",
-      "email": "niatidas009@gmail.com",
-      "ign": "Rups",
-      "signupDate": "2026-09-06T16:39:10.650Z",
-      "highestScore": 40,
-      "timeSurvived": "0:27",
-      "gamesPlayed": 8,
-      "lastLogin": "2026-09-06T17:44:02.488Z",
-      "lastActive": "2026-09-06T17:44:02.488Z"
     },
     {
       "id": "usr_1788683198169_oesj2",
