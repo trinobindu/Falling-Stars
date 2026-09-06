@@ -1,6 +1,6 @@
 {
   "totalSignups": 37,
-  "lastUpdated": "2026-09-06T17:39:00.255Z",
+  "lastUpdated": "2026-09-06T17:39:04.292Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -190,6 +190,17 @@
       "lastLogin": "2026-09-06T14:38:31.808Z"
     },
     {
+      "id": "usr_1788716127149_bs8aa",
+      "email": "mithechuriappy@gmail.com",
+      "ign": "mimi",
+      "signupDate": "2026-09-06T17:35:27.149Z",
+      "highestScore": 50,
+      "timeSurvived": "0:22",
+      "gamesPlayed": 5,
+      "lastLogin": "2026-09-06T17:39:00.249Z",
+      "lastActive": "2026-09-06T17:39:00.249Z"
+    },
+    {
       "id": "usr_1788633566964_bgxpa",
       "email": "example@gmail.com",
       "ign": "exampleUser",
@@ -198,17 +209,6 @@
       "timeSurvived": "0:20",
       "gamesPlayed": 1,
       "lastLogin": "2026-09-05T18:39:26.964Z"
-    },
-    {
-      "id": "usr_1788716127149_bs8aa",
-      "email": "mithechuriappy@gmail.com",
-      "ign": "mimi",
-      "signupDate": "2026-09-06T17:35:27.149Z",
-      "highestScore": 45,
-      "timeSurvived": "0:25",
-      "gamesPlayed": 4,
-      "lastLogin": "2026-09-06T17:38:33.101Z",
-      "lastActive": "2026-09-06T17:38:33.101Z"
     },
     {
       "id": "usr_1788633310874_zfavd",
