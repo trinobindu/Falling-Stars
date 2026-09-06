@@ -1,6 +1,6 @@
 {
-  "totalSignups": 23,
-  "lastUpdated": "2026-09-06T14:25:12.084Z",
+  "totalSignups": 24,
+  "lastUpdated": "2026-09-06T14:25:18.930Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -9,8 +9,8 @@
       "signupDate": "2026-09-06T14:20:53.795Z",
       "highestScore": 185,
       "timeSurvived": "0:57",
-      "gamesPlayed": 5,
-      "lastLogin": "2026-09-06T14:24:34.688Z"
+      "gamesPlayed": 4,
+      "lastLogin": "2026-09-06T14:23:38.088Z"
     },
     {
       "id": "usr_1788618599477_di185",
@@ -19,8 +19,8 @@
       "signupDate": "2026-09-05T14:29:59.477Z",
       "highestScore": 112,
       "timeSurvived": "0:46",
-      "gamesPlayed": 14,
-      "lastLogin": "2026-09-06T14:22:55.250Z"
+      "gamesPlayed": 15,
+      "lastLogin": "2026-09-06T14:25:11.570Z"
     },
     {
       "id": "usr_1788632060759_212we",
@@ -40,7 +40,7 @@
       "highestScore": 101,
       "timeSurvived": "0:20",
       "gamesPlayed": 2,
-      "lastLogin": "2026-09-06T14:24:06.276Z"
+      "lastLogin": "2026-09-06T14:24:14.621Z"
     },
     {
       "id": "usr_1788704337385_sfi7u",
@@ -49,8 +49,8 @@
       "signupDate": "2026-09-06T14:18:57.385Z",
       "highestScore": 86,
       "timeSurvived": "0:33",
-      "gamesPlayed": 4,
-      "lastLogin": "2026-09-06T14:24:53.208Z"
+      "gamesPlayed": 3,
+      "lastLogin": "2026-09-06T14:20:41.156Z"
     },
     {
       "id": "usr_1788686708495_t6jx5",
@@ -121,6 +121,16 @@
       "timeSurvived": "0:21",
       "gamesPlayed": 1,
       "lastLogin": "2026-09-05T17:38:05.886Z"
+    },
+    {
+      "id": "usr_1788704701837_uqkk4",
+      "email": "nathp6998@gmail.com",
+      "ign": "nathp6998@gmail.",
+      "signupDate": "2026-09-06T14:25:01.837Z",
+      "highestScore": 44,
+      "timeSurvived": "0:24",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-06T14:25:01.837Z"
     },
     {
       "id": "usr_1788616918113_13k4n",
