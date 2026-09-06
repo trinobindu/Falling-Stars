@@ -1,6 +1,6 @@
 {
   "totalSignups": 23,
-  "lastUpdated": "2026-09-06T14:24:40.846Z",
+  "lastUpdated": "2026-09-06T14:24:53.095Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -9,8 +9,8 @@
       "signupDate": "2026-09-06T14:20:53.795Z",
       "highestScore": 185,
       "timeSurvived": "0:57",
-      "gamesPlayed": 5,
-      "lastLogin": "2026-09-06T14:24:34.688Z"
+      "gamesPlayed": 4,
+      "lastLogin": "2026-09-06T14:23:38.088Z"
     },
     {
       "id": "usr_1788618599477_di185",
@@ -40,7 +40,7 @@
       "highestScore": 101,
       "timeSurvived": "0:20",
       "gamesPlayed": 2,
-      "lastLogin": "2026-09-06T14:24:06.276Z"
+      "lastLogin": "2026-09-06T14:24:14.621Z"
     },
     {
       "id": "usr_1788704337385_sfi7u",
