@@ -3,10 +3,9 @@
   "email": "sankalp12106@gmail.com",
   "ign": "SANKALP",
   "signupDate": "2026-09-06T08:26:38.169Z",
-  "highestScore": 0,
-  "timeSurvived": "0:00",
-  "gamesPlayed": 0,
-  "lastLogin": "2026-09-06T16:34:00.120Z",
-  "salt": "8966de7c4d8885f6ee20ffb5dc8d3ff9",
-  "hash": "b42b8e5baa1dc46f72e9c2ca357fc9d24e57cb41189c0a44244c3ff8ecbb1152b3eb4f1f7c00f85a9c3d607f7523f3e730f1938344b15730cb70acdde4aaf07b"
+  "highestScore": 40,
+  "timeSurvived": "0:25",
+  "gamesPlayed": 1,
+  "lastLogin": "2026-09-06T16:34:59.085Z",
+  "lastActive": "2026-09-06T16:34:59.085Z"
 }
