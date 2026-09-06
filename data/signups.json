@@ -1,6 +1,6 @@
 {
   "totalSignups": 28,
-  "lastUpdated": "2026-09-06T14:42:07.949Z",
+  "lastUpdated": "2026-09-06T14:42:16.897Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -278,9 +278,9 @@
       "ign": "Boss",
       "signupDate": "2026-09-06T14:41:28.705Z",
       "highestScore": 88,
-      "timeSurvived": "0:20",
-      "gamesPlayed": 1,
-      "lastLogin": "2026-09-06T14:41:28.705Z"
+      "timeSurvived": "0:32",
+      "gamesPlayed": 2,
+      "lastLogin": "2026-09-06T14:42:16.897Z"
     }
   ]
 }
