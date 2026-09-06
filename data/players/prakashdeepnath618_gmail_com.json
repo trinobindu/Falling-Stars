@@ -1,10 +1,12 @@
 {
   "id": "usr_1788633436879_kpwn2",
   "email": "prakashdeepnath618@gmail.com",
-  "ign": "prakash",
+  "ign": "prakashdeep",
   "signupDate": "2026-09-05T18:37:16.879Z",
   "highestScore": 0,
   "timeSurvived": "0:00",
   "gamesPlayed": 0,
-  "lastLogin": "2026-09-05T18:37:16.879Z"
+  "lastLogin": "2026-09-06T14:34:35.799Z",
+  "salt": "c6fc85e0b4e56f74ea4c0eb98970cfa2",
+  "hash": "b9868639180b819eb9bb05229b84b680041b1847b6a952f8aadaea5c6d36bc6e4ee3c1dd4322190dd9d0b7c5d492911beb8aa292efb4b47fbd4a2b37d214712c"
 }
