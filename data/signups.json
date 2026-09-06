@@ -1,6 +1,6 @@
 {
-  "totalSignups": 23,
-  "lastUpdated": "2026-09-06T14:24:53.095Z",
+  "totalSignups": 24,
+  "lastUpdated": "2026-09-06T14:25:01.837Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -231,6 +231,16 @@
       "timeSurvived": "0:00",
       "gamesPlayed": 0,
       "lastLogin": "2026-09-06T10:09:04.163Z"
+    },
+    {
+      "id": "usr_1788704701837_uqkk4",
+      "email": "nathp6998@gmail.com",
+      "ign": "nathp6998@gmail.",
+      "signupDate": "2026-09-06T14:25:01.837Z",
+      "highestScore": 44,
+      "timeSurvived": "0:24",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-06T14:25:01.837Z"
     }
   ]
 }
