@@ -1,12 +1,11 @@
 {
-  "id": "usr_1788705349715_n3pd4",
+  "id": "usr_1788705385517_xsw00",
   "email": "namamahesh643@gmail.com",
   "ign": "namamahesh643@gm",
-  "salt": "bbaae8a7c38348b599aa7a01ccd42438",
-  "hash": "0dea8b41290e0bd08c8d211ef8a471ded5a24d961c0adcdbfae8e3b777b58546895c82d11283eb7a5b6730d309853c2aea32741add07e784ea86bbf2bcd5d710",
-  "signupDate": "2026-09-06T14:35:49.715Z",
-  "lastLogin": "2026-09-06T14:35:49.715Z",
-  "highestScore": 0,
-  "timeSurvived": "0:00",
-  "gamesPlayed": 0
+  "signupDate": "2026-09-06T14:36:25.517Z",
+  "lastLogin": "2026-09-06T14:36:25.517Z",
+  "highestScore": 6,
+  "timeSurvived": "0:20",
+  "gamesPlayed": 1,
+  "lastActive": "2026-09-06T14:36:25.517Z"
 }
