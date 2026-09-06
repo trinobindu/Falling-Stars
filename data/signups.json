@@ -1,6 +1,6 @@
 {
   "totalSignups": 25,
-  "lastUpdated": "2026-09-06T14:35:39.350Z",
+  "lastUpdated": "2026-09-06T14:35:49.529Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -19,8 +19,8 @@
       "signupDate": "2026-09-05T14:29:59.477Z",
       "highestScore": 112,
       "timeSurvived": "0:46",
-      "gamesPlayed": 18,
-      "lastLogin": "2026-09-06T14:35:38.083Z"
+      "gamesPlayed": 17,
+      "lastLogin": "2026-09-06T14:35:09.558Z"
     },
     {
       "id": "usr_1788632060759_212we",
@@ -203,6 +203,16 @@
       "lastLogin": "2026-09-05T17:36:36.352Z"
     },
     {
+      "id": "usr_1788705320027_mk4jf",
+      "email": "pravade863@gmail.com",
+      "ign": "pravade863@gmail",
+      "signupDate": "2026-09-06T14:35:20.027Z",
+      "highestScore": 19,
+      "timeSurvived": "0:16",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-06T14:35:42.275Z"
+    },
+    {
       "id": "usr_1788618450939_vl2is",
       "email": "trinobindu@gmail.com",
       "ign": "Yoo",
@@ -241,16 +251,6 @@
       "timeSurvived": "0:00",
       "gamesPlayed": 0,
       "lastLogin": "2026-09-06T10:09:04.163Z"
-    },
-    {
-      "id": "usr_1788705320027_mk4jf",
-      "email": "pravade863@gmail.com",
-      "ign": "pravade863@gmail",
-      "signupDate": "2026-09-06T14:35:20.027Z",
-      "highestScore": 0,
-      "timeSurvived": "0:00",
-      "gamesPlayed": 0,
-      "lastLogin": "2026-09-06T14:35:20.027Z"
     }
   ]
 }
