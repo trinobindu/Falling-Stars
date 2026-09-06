@@ -1,6 +1,6 @@
 {
-  "totalSignups": 30,
-  "lastUpdated": "2026-09-06T14:45:58.285Z",
+  "totalSignups": 29,
+  "lastUpdated": "2026-09-06T14:46:17.217Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -19,8 +19,8 @@
       "signupDate": "2026-09-05T14:29:59.477Z",
       "highestScore": 112,
       "timeSurvived": "0:46",
-      "gamesPlayed": 22,
-      "lastLogin": "2026-09-06T14:42:06.687Z"
+      "gamesPlayed": 24,
+      "lastLogin": "2026-09-06T14:42:21.823Z"
     },
     {
       "id": "usr_1788632060759_212we",
@@ -48,9 +48,9 @@
       "ign": "Boss",
       "signupDate": "2026-09-06T14:41:28.705Z",
       "highestScore": 88,
-      "timeSurvived": "0:20",
-      "gamesPlayed": 1,
-      "lastLogin": "2026-09-06T14:41:28.705Z"
+      "timeSurvived": "0:32",
+      "gamesPlayed": 2,
+      "lastLogin": "2026-09-06T14:42:16.897Z"
     },
     {
       "id": "usr_1788704337385_sfi7u",
@@ -83,24 +83,14 @@
       "lastLogin": "2026-09-05T18:52:43.668Z"
     },
     {
-      "id": "usr_1788705954932_smwaz",
+      "id": "usr_1788705879877_ddswc",
       "email": "ay97948328@gmail.com",
       "ign": "ay97948328@gmail",
-      "signupDate": "2026-09-06T14:45:54.932Z",
+      "signupDate": "2026-09-06T14:44:39.877Z",
       "highestScore": 69,
-      "timeSurvived": "0:22",
+      "timeSurvived": "0:20",
       "gamesPlayed": 1,
-      "lastLogin": "2026-09-06T14:45:54.932Z"
-    },
-    {
-      "id": "usr_1788705894928_54fei",
-      "email": "baapkomatsikha@gmail.com",
-      "ign": "Baaphutera",
-      "signupDate": "2026-09-06T14:44:54.928Z",
-      "highestScore": 56,
-      "timeSurvived": "0:23",
-      "gamesPlayed": 1,
-      "lastLogin": "2026-09-06T14:45:23.530Z"
+      "lastLogin": "2026-09-06T14:44:39.877Z"
     },
     {
       "id": "usr_1788626307212_kk989",
