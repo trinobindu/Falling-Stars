@@ -1,6 +1,6 @@
 {
-  "totalSignups": 35,
-  "lastUpdated": "2026-09-06T16:39:22.378Z",
+  "totalSignups": 36,
+  "lastUpdated": "2026-09-06T16:39:51.459Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -359,6 +359,16 @@
       "timeSurvived": "0:00",
       "gamesPlayed": 0,
       "lastLogin": "2026-09-06T10:09:04.163Z"
+    },
+    {
+      "id": "usr_1788712750650_kzl89",
+      "email": "niatidas009@gmail.com",
+      "ign": "Rups",
+      "signupDate": "2026-09-06T16:39:10.650Z",
+      "highestScore": 0,
+      "timeSurvived": "0:00",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-06T16:39:38.166Z"
     }
   ]
 }
