@@ -14,7 +14,9 @@ module.exports = async function handler(req, res) {
   }
 
   const email = (data.email || '').trim().toLowerCase();
-  const score = parseInt(data.score, 10) || 0;
+  const rawScore = parseInt(data.score, 10) || 0;
+  const rawHighScore = parseInt(data.highScore, 10) || 0;
+  const score = Math.max(rawScore, rawHighScore);
   const timeSurvived = (data.timeSurvived || '0:00').trim();
   const ign = (data.ign || '').trim();
 

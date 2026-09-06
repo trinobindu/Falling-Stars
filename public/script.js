@@ -738,12 +738,12 @@
       return [];
     },
 
-    async recordScore(email, score, timeSurvived, ign) {
+    async recordScore(email, score, timeSurvived, ign, highScore) {
       try {
         const res = await fetch(`${API_BASE}/api/score`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, score, timeSurvived, ign })
+          body: JSON.stringify({ email, score, timeSurvived, ign, highScore: highScore || score })
         });
         if (res.ok) {
           return await res.json();
@@ -951,6 +951,34 @@
     }
   }
 
+  // Auto-heal and sync local offline scores to the cloud server
+  async function syncLocalSessionWithServer(user) {
+    if (!user || !user.email) return;
+    try {
+      const email = user.email.trim().toLowerCase();
+      const ign = user.ign || user.name || email.split('@')[0];
+      const key = getHighScoreKey();
+      let best = state.highScore || 0;
+      try {
+        const s = parseInt(localStorage.getItem(key), 10);
+        if (!isNaN(s) && s > best) best = s;
+      } catch (e) {}
+
+      const res = await API.recordScore(email, best, '0:20', ign, best);
+      if (res && typeof res.highestScore === 'number' && res.highestScore > 0) {
+        if (res.highestScore > state.highScore) {
+          state.highScore = res.highestScore;
+          saveHighScore(state.highScore);
+          if (DOM.bestDisplay) DOM.bestDisplay.textContent = state.highScore;
+          if (DOM.readyBest) DOM.readyBest.textContent = state.highScore;
+        }
+      }
+      renderLeaderboard();
+    } catch (err) {
+      console.warn('Sync session error:', err);
+    }
+  }
+
   // Load saved user session from localStorage
   function loadUserSession() {
     try {
@@ -962,6 +990,7 @@
             user.ign = user.name || user.email.split('@')[0];
           }
           applyUserSession(user);
+          syncLocalSessionWithServer(user);
           return;
         }
       }
@@ -1368,7 +1397,7 @@
     // Record score into server folder & leaderboard
     if (state.currentUser) {
       const timeStr = formatTime(state.elapsedSeconds);
-      const res = await API.recordScore(state.currentUser.email, state.score, timeStr, state.currentUser.ign);
+      const res = await API.recordScore(state.currentUser.email, state.score, timeStr, state.currentUser.ign, state.highScore);
       if (res) {
         if (typeof res.highestScore === 'number' && res.highestScore > 0) {
           if (res.highestScore > state.highScore) {
@@ -1482,7 +1511,13 @@
     // Pause / Resume buttons
     DOM.btnPause.addEventListener('click', togglePause);
     DOM.btnResume.addEventListener('click', resumeGame);
-    DOM.btnPauseRestart.addEventListener('click', startGame);
+    DOM.btnPauseRestart.addEventListener('click', () => {
+      if (state.isRunning && state.score > 0 && state.currentUser) {
+        const timeStr = formatTime(state.elapsedSeconds);
+        API.recordScore(state.currentUser.email, state.score, timeStr, state.currentUser.ign, state.highScore);
+      }
+      startGame();
+    });
 
     // Game Over buttons
     DOM.btnPlayAgain.addEventListener('click', startGame);
@@ -1743,6 +1778,24 @@
         });
       });
     }
+
+
+    // Auto-save score on tab close or mobile app switch
+    window.addEventListener('pagehide', () => {
+      if (state.isRunning && state.score > 0 && state.currentUser) {
+        const timeStr = formatTime(state.elapsedSeconds);
+        const payload = JSON.stringify({
+          email: state.currentUser.email,
+          score: state.score,
+          timeSurvived: timeStr,
+          ign: state.currentUser.ign,
+          highScore: state.highScore
+        });
+        if (navigator.sendBeacon) {
+          navigator.sendBeacon(`${API_BASE}/api/score`, payload);
+        }
+      }
+    });
 
     // Global Keyboard Shortcuts
     window.addEventListener('keydown', (e) => {
