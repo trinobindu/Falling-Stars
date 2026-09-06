@@ -1,6 +1,6 @@
 {
-  "totalSignups": 37,
-  "lastUpdated": "2026-09-06T17:45:35.331Z",
+  "totalSignups": 38,
+  "lastUpdated": "2026-09-06T17:52:42.284Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -199,6 +199,16 @@
       "timeSurvived": "0:21",
       "gamesPlayed": 2,
       "lastLogin": "2026-09-06T14:38:31.808Z"
+    },
+    {
+      "id": "usr_1788717111475_jebao",
+      "email": "palashdebkgt@gmail.com",
+      "ign": "PALASH DEB",
+      "signupDate": "2026-09-06T17:51:51.475Z",
+      "highestScore": 51,
+      "timeSurvived": "0:20",
+      "gamesPlayed": 2,
+      "lastLogin": "2026-09-06T17:52:39.892Z"
     },
     {
       "id": "usr_1788716127149_bs8aa",
