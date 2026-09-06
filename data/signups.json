@@ -1,6 +1,6 @@
 {
-  "totalSignups": 32,
-  "lastUpdated": "2026-09-06T15:10:46.832Z",
+  "totalSignups": 33,
+  "lastUpdated": "2026-09-06T15:18:35.157Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -111,6 +111,16 @@
       "timeSurvived": "0:29",
       "gamesPlayed": 3,
       "lastLogin": "2026-09-06T14:47:46.182Z"
+    },
+    {
+      "id": "usr_1788703410337_djxxo",
+      "email": "cosmic_star_0537@gmail.com",
+      "ign": "Star0537",
+      "signupDate": "2026-09-06T14:03:30.337Z",
+      "highestScore": 65,
+      "timeSurvived": "0:28",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-06T14:03:30.337Z"
     },
     {
       "id": "usr_1788705894928_54fei",
