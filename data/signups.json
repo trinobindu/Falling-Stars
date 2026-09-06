@@ -1,6 +1,6 @@
 {
-  "totalSignups": 26,
-  "lastUpdated": "2026-09-06T14:36:57.092Z",
+  "totalSignups": 27,
+  "lastUpdated": "2026-09-06T14:37:32.027Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -261,6 +261,16 @@
       "timeSurvived": "0:00",
       "gamesPlayed": 0,
       "lastLogin": "2026-09-06T10:09:04.163Z"
+    },
+    {
+      "id": "usr_1788705452027_qq5qp",
+      "email": "hillionreang29@gmail.com",
+      "ign": "hillionreang29@g",
+      "signupDate": "2026-09-06T14:37:32.027Z",
+      "highestScore": 0,
+      "timeSurvived": "0:00",
+      "gamesPlayed": 0,
+      "lastLogin": "2026-09-06T14:37:32.027Z"
     }
   ]
 }
