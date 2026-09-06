@@ -1,6 +1,6 @@
 {
   "totalSignups": 27,
-  "lastUpdated": "2026-09-06T14:38:31.808Z",
+  "lastUpdated": "2026-09-06T14:38:41.695Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -93,6 +93,16 @@
       "lastLogin": "2026-09-06T08:19:22.559Z"
     },
     {
+      "id": "usr_1788705452027_qq5qp",
+      "email": "hillionreang29@gmail.com",
+      "ign": "hillionreang29@g",
+      "signupDate": "2026-09-06T14:37:32.027Z",
+      "highestScore": 51,
+      "timeSurvived": "0:21",
+      "gamesPlayed": 2,
+      "lastLogin": "2026-09-06T14:38:31.808Z"
+    },
+    {
       "id": "usr_1788633566964_bgxpa",
       "email": "example@gmail.com",
       "ign": "exampleUser",
@@ -131,16 +141,6 @@
       "timeSurvived": "0:24",
       "gamesPlayed": 1,
       "lastLogin": "2026-09-06T14:25:01.837Z"
-    },
-    {
-      "id": "usr_1788705452027_qq5qp",
-      "email": "hillionreang29@gmail.com",
-      "ign": "hillionreang29@g",
-      "signupDate": "2026-09-06T14:37:32.027Z",
-      "highestScore": 51,
-      "timeSurvived": "0:21",
-      "gamesPlayed": 2,
-      "lastLogin": "2026-09-06T14:38:31.808Z"
     },
     {
       "id": "usr_1788616918113_13k4n",
