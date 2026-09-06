@@ -1,6 +1,6 @@
 {
   "totalSignups": 31,
-  "lastUpdated": "2026-09-06T14:47:32.424Z",
+  "lastUpdated": "2026-09-06T14:47:33.881Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -19,8 +19,8 @@
       "signupDate": "2026-09-05T14:29:59.477Z",
       "highestScore": 112,
       "timeSurvived": "0:46",
-      "gamesPlayed": 23,
-      "lastLogin": "2026-09-06T14:46:16.937Z"
+      "gamesPlayed": 24,
+      "lastLogin": "2026-09-06T14:47:32.578Z"
     },
     {
       "id": "usr_1788632060759_212we",
@@ -81,16 +81,6 @@
       "timeSurvived": "0:31",
       "gamesPlayed": 15,
       "lastLogin": "2026-09-05T18:52:43.668Z"
-    },
-    {
-      "id": "usr_1788706046345_lpfhr",
-      "email": "krishsin29@gmail.com",
-      "ign": "Seenu2",
-      "signupDate": "2026-09-06T14:47:26.345Z",
-      "highestScore": 76,
-      "timeSurvived": "0:25",
-      "gamesPlayed": 1,
-      "lastLogin": "2026-09-06T14:47:26.345Z"
     },
     {
       "id": "usr_1788705954932_smwaz",
@@ -311,6 +301,16 @@
       "timeSurvived": "0:00",
       "gamesPlayed": 0,
       "lastLogin": "2026-09-06T10:09:04.163Z"
+    },
+    {
+      "id": "usr_1788706036852_e834u",
+      "email": "dibyarupdebnath7@gmail.com",
+      "ign": "dibyarupdebnath7",
+      "signupDate": "2026-09-06T14:47:16.852Z",
+      "highestScore": 0,
+      "timeSurvived": "0:00",
+      "gamesPlayed": 0,
+      "lastLogin": "2026-09-06T14:47:16.852Z"
     }
   ]
 }
