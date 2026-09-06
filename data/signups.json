@@ -1,6 +1,6 @@
 {
   "totalSignups": 39,
-  "lastUpdated": "2026-09-06T18:44:26.226Z",
+  "lastUpdated": "2026-09-06T18:46:17.140Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -14,6 +14,17 @@
       "lastActive": "2026-09-06T18:22:28.552Z"
     },
     {
+      "id": "usr_1788719019647_dgsci",
+      "email": "ayandebnath0123@gmail.com",
+      "ign": "surjya2",
+      "signupDate": "2026-09-06T18:23:39.647Z",
+      "highestScore": 174,
+      "timeSurvived": "0:53",
+      "gamesPlayed": 20,
+      "lastLogin": "2026-09-06T18:46:09.370Z",
+      "lastActive": "2026-09-06T18:46:09.370Z"
+    },
+    {
       "id": "usr_1788618599477_di185",
       "email": "td5298@gmail.com",
       "ign": "Trino",
@@ -23,17 +34,6 @@
       "gamesPlayed": 37,
       "lastLogin": "2026-09-06T18:17:21.125Z",
       "lastActive": "2026-09-06T18:17:21.125Z"
-    },
-    {
-      "id": "usr_1788719019647_dgsci",
-      "email": "ayandebnath0123@gmail.com",
-      "ign": "surjya2",
-      "signupDate": "2026-09-06T18:23:39.647Z",
-      "highestScore": 151,
-      "timeSurvived": "0:47",
-      "gamesPlayed": 18,
-      "lastLogin": "2026-09-06T18:44:19.720Z",
-      "lastActive": "2026-09-06T18:44:19.720Z"
     },
     {
       "id": "usr_1788708770303_bw7uw",
