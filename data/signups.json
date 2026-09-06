@@ -1,6 +1,6 @@
 {
-  "totalSignups": 24,
-  "lastUpdated": "2026-09-06T14:35:10.985Z",
+  "totalSignups": 25,
+  "lastUpdated": "2026-09-06T14:35:20.028Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -241,6 +241,16 @@
       "timeSurvived": "0:00",
       "gamesPlayed": 0,
       "lastLogin": "2026-09-06T10:09:04.163Z"
+    },
+    {
+      "id": "usr_1788705320027_mk4jf",
+      "email": "pravade863@gmail.com",
+      "ign": "pravade863@gmail",
+      "signupDate": "2026-09-06T14:35:20.027Z",
+      "highestScore": 0,
+      "timeSurvived": "0:00",
+      "gamesPlayed": 0,
+      "lastLogin": "2026-09-06T14:35:20.027Z"
     }
   ]
 }
