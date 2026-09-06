@@ -1,6 +1,6 @@
 {
   "totalSignups": 33,
-  "lastUpdated": "2026-09-06T15:19:40.046Z",
+  "lastUpdated": "2026-09-06T15:29:36.401Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -119,8 +119,9 @@
       "signupDate": "2026-09-06T14:03:30.337Z",
       "highestScore": 65,
       "timeSurvived": "0:28",
-      "gamesPlayed": 1,
-      "lastLogin": "2026-09-06T14:03:30.337Z"
+      "gamesPlayed": 2,
+      "lastLogin": "2026-09-06T15:24:57.620Z",
+      "lastActive": "2026-09-06T15:24:57.620Z"
     },
     {
       "id": "usr_1788705894928_54fei",
