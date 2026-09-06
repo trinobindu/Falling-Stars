@@ -1,6 +1,6 @@
 {
-  "totalSignups": 34,
-  "lastUpdated": "2026-09-06T15:39:13.835Z",
+  "totalSignups": 35,
+  "lastUpdated": "2026-09-06T15:39:38.814Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -344,6 +344,16 @@
       "timeSurvived": "0:00",
       "gamesPlayed": 0,
       "lastLogin": "2026-09-06T10:09:04.163Z"
+    },
+    {
+      "id": "usr_1788708770303_bw7uw",
+      "email": "rnag@gmail.com",
+      "ign": "Fire",
+      "signupDate": "2026-09-06T15:32:50.304Z",
+      "highestScore": 0,
+      "timeSurvived": "0:00",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-06T15:39:13.923Z"
     }
   ]
 }
