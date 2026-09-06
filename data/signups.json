@@ -1,6 +1,6 @@
 {
-  "totalSignups": 21,
-  "lastUpdated": "2026-09-06T14:19:34.154Z",
+  "totalSignups": 22,
+  "lastUpdated": "2026-09-06T14:20:19.898Z",
   "players": [
     {
       "id": "usr_1788618599477_di185",
@@ -211,6 +211,16 @@
       "timeSurvived": "0:33",
       "gamesPlayed": 2,
       "lastLogin": "2026-09-06T14:19:34.153Z"
+    },
+    {
+      "id": "usr_1788704419898_6hoqs",
+      "email": "krishansinha276@gmail.com",
+      "ign": "Seenu",
+      "signupDate": "2026-09-06T14:20:19.898Z",
+      "highestScore": 1,
+      "timeSurvived": "0:08",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-06T14:20:19.898Z"
     }
   ]
 }
