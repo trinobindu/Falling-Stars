@@ -2,12 +2,9 @@
   "id": "usr_1788632060759_212we",
   "email": "abhi1845653903@gmail.com",
   "ign": "abhi",
-  "salt": "dc8a9455059f6418ba4d8d1a56aaf56b",
-  "hash": "414e6f424069d9a10915df309924e1c310ee34270cb08bb72773a2703b38d072e4b7b58363360e72b33d1020a873fd6e89628b81432a3bd329e49c1422b9f1cc",
   "signupDate": "2026-09-05T18:14:20.759Z",
-  "lastLogin": "2026-09-05T18:17:43.397Z",
   "highestScore": 52,
   "timeSurvived": "0:22",
   "gamesPlayed": 3,
-  "lastActive": "2026-09-05T18:17:43.397Z"
+  "lastLogin": "2026-09-05T18:17:43.397Z"
 }

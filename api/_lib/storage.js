@@ -1,13 +1,13 @@
 /**
  * Shared Storage & Auth Utilities for Catch the Stars
- * Supports Vercel Blob persistent cloud storage and local filesystem fallback.
+ * Supports GitHub as primary cloud database with Vercel Blob and local filesystem fallback.
  */
 
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const { put, get, list } = require('@vercel/blob');
-const { syncToGitHub } = require('./github');
+const { fetchFileFromGitHub, commitFileToGitHub, syncToGitHub } = require('./github');
 
 const DEFAULT_BLOB_TOKEN = 'vercel_blob_rw_wTxcSbU6kJIYPPap_DDis7jlnDKMVxLFlqHlcucGFitThMn';
 const localDataDir = path.join(process.cwd(), 'data');
@@ -28,12 +28,39 @@ function getBlobToken() {
   return DEFAULT_BLOB_TOKEN;
 }
 
-// In-memory cache for fast reads
+// In-memory cache for fast reads (<10ms response time)
 let memoryCache = {
   players: null,
   timestamp: 0
 };
 const CACHE_TTL_MS = 2000;
+
+function parseTimeToSeconds(timeStr) {
+  if (!timeStr || typeof timeStr !== 'string') return 0;
+  const parts = timeStr.trim().split(':');
+  if (parts.length === 2) {
+    const mins = parseInt(parts[0], 10) || 0;
+    const secs = parseInt(parts[1], 10) || 0;
+    return mins * 60 + secs;
+  }
+  return parseInt(timeStr, 10) || 0;
+}
+
+function sortPlayers(a, b) {
+  const scoreDiff = (b.highestScore || 0) - (a.highestScore || 0);
+  if (scoreDiff !== 0) return scoreDiff;
+
+  // Higher survival time breaks ties
+  const timeA = parseTimeToSeconds(a.timeSurvived);
+  const timeB = parseTimeToSeconds(b.timeSurvived);
+  const timeDiff = timeB - timeA;
+  if (timeDiff !== 0) return timeDiff;
+
+  // Earlier signup breaks ties
+  const dateA = new Date(a.signupDate || 0).getTime();
+  const dateB = new Date(b.signupDate || 0).getTime();
+  return dateA - dateB;
+}
 
 function getLocalSeedPlayers() {
   const players = [];
@@ -69,7 +96,7 @@ function writeToLocalFilesystem(players) {
     if (!fs.existsSync(localPlayersDir)) fs.mkdirSync(localPlayersDir, { recursive: true });
 
     for (const p of players) {
-      const sanitized = p.email.toLowerCase().replace(/[^a-z0-9]/g, '_');
+      const sanitized = (p.email || 'user').toLowerCase().replace(/[^a-z0-9]/g, '_');
       const filePath = path.join(localPlayersDir, `${sanitized}.json`);
       fs.writeFileSync(filePath, JSON.stringify(p, null, 2), 'utf8');
     }
@@ -98,30 +125,63 @@ async function loadAllPlayers() {
     return memoryCache.players;
   }
 
+  // 1. Primary Cloud Source: Read from GitHub
+  try {
+    const ghData = await fetchFileFromGitHub('data/signups.json');
+    if (ghData && ghData.content) {
+      const parsed = JSON.parse(ghData.content);
+      if (parsed && Array.isArray(parsed.players) && parsed.players.length > 0) {
+        memoryCache.players = parsed.players;
+        memoryCache.timestamp = now;
+        writeToLocalFilesystem(parsed.players);
+        return parsed.players;
+      }
+    }
+  } catch (ghErr) {
+    // Fallback to raw githubusercontent if API rate limited
+    try {
+      const rawRes = await fetch(`https://raw.githubusercontent.com/trinobindu/Falling-Stars/main/data/signups.json?t=${now}`);
+      if (rawRes.ok) {
+        const rawJson = await rawRes.json();
+        if (rawJson && Array.isArray(rawJson.players) && rawJson.players.length > 0) {
+          memoryCache.players = rawJson.players;
+          memoryCache.timestamp = now;
+          writeToLocalFilesystem(rawJson.players);
+          return rawJson.players;
+        }
+      }
+    } catch (rawErr) {}
+  }
+
+  // 2. Secondary Cloud Fallback: Vercel Blob (if unblocked)
   const token = getBlobToken();
   if (token) {
     try {
       const res = await list({ token });
       const blobItem = res.blobs.find(b => b.pathname === 'players.json');
       if (blobItem) {
-        const freshUrl = blobItem.url.includes('?') ? `${blobItem.url}&t=${now}` : `${blobItem.url}?t=${now}`;
-        const blob = await get(freshUrl, { token, access: 'private' });
+        const blob = await get(blobItem.url, { token, access: 'private' });
         const text = await new Response(blob.stream).text();
         const players = JSON.parse(text);
-        memoryCache.players = players;
-        memoryCache.timestamp = now;
-        writeToLocalFilesystem(players);
-        return players;
+        if (Array.isArray(players) && players.length > 0) {
+          memoryCache.players = players;
+          memoryCache.timestamp = now;
+          writeToLocalFilesystem(players);
+          return players;
+        }
       }
-    } catch (blobErr) {
-      console.warn('Vercel Blob read warning:', blobErr.message);
-    }
+    } catch (blobErr) {}
   }
 
+  // 3. Tertiary Local Filesystem Fallback
   const fallback = getLocalSeedPlayers();
-  memoryCache.players = fallback;
-  memoryCache.timestamp = now;
-  return fallback;
+  if (fallback && fallback.length > 0) {
+    memoryCache.players = fallback;
+    memoryCache.timestamp = now;
+    return fallback;
+  }
+
+  return memoryCache.players || [];
 }
 
 async function saveAllPlayers(players) {
@@ -130,6 +190,25 @@ async function saveAllPlayers(players) {
 
   writeToLocalFilesystem(players);
 
+  // Commit signups.json to GitHub repository in background
+  const signupsSummary = {
+    totalSignups: players.length,
+    lastUpdated: new Date().toISOString(),
+    players: players.map(p => ({
+      id: p.id,
+      email: p.email,
+      ign: p.ign,
+      signupDate: p.signupDate,
+      highestScore: p.highestScore || 0,
+      timeSurvived: p.timeSurvived || '0:00',
+      gamesPlayed: p.gamesPlayed || 0,
+      lastLogin: p.lastLogin || p.signupDate
+    }))
+  };
+
+  commitFileToGitHub('data/signups.json', JSON.stringify(signupsSummary, null, 2), `chore(signups): sync ${players.length} players`).catch(() => {});
+
+  // Also attempt Blob if available
   const token = getBlobToken();
   if (token) {
     try {
@@ -139,9 +218,7 @@ async function saveAllPlayers(players) {
         addRandomSuffix: false,
         allowOverwrite: true
       });
-    } catch (blobErr) {
-      console.error('Vercel Blob save error:', blobErr);
-    }
+    } catch (blobErr) {}
   }
 
   return players;
@@ -165,36 +242,9 @@ async function savePlayer(player) {
   }
 
   await saveAllPlayers(players);
+  // Commit individual player file to GitHub in background
   syncToGitHub(player, players).catch(() => {});
   return player;
-}
-
-
-function parseTimeToSeconds(timeStr) {
-  if (!timeStr || typeof timeStr !== 'string') return 0;
-  const parts = timeStr.trim().split(':');
-  if (parts.length === 2) {
-    const mins = parseInt(parts[0], 10) || 0;
-    const secs = parseInt(parts[1], 10) || 0;
-    return mins * 60 + secs;
-  }
-  return parseInt(timeStr, 10) || 0;
-}
-
-function sortPlayers(a, b) {
-  const scoreDiff = (b.highestScore || 0) - (a.highestScore || 0);
-  if (scoreDiff !== 0) return scoreDiff;
-
-  // Higher survival time breaks ties
-  const timeA = parseTimeToSeconds(a.timeSurvived);
-  const timeB = parseTimeToSeconds(b.timeSurvived);
-  const timeDiff = timeB - timeA;
-  if (timeDiff !== 0) return timeDiff;
-
-  // Earlier signup breaks ties
-  const dateA = new Date(a.signupDate || 0).getTime();
-  const dateB = new Date(b.signupDate || 0).getTime();
-  return dateA - dateB;
 }
 
 function hashPassword(password) {
