@@ -1,6 +1,6 @@
 {
-  "totalSignups": 20,
-  "lastUpdated": "2026-09-06T14:18:34.063Z",
+  "totalSignups": 21,
+  "lastUpdated": "2026-09-06T14:18:57.385Z",
   "players": [
     {
       "id": "usr_1788618599477_di185",
@@ -201,6 +201,16 @@
       "timeSurvived": "0:00",
       "gamesPlayed": 0,
       "lastLogin": "2026-09-06T10:09:04.163Z"
+    },
+    {
+      "id": "usr_1788704337385_sfi7u",
+      "email": "subhangkardas77@gmail.com",
+      "ign": "Sam...........",
+      "signupDate": "2026-09-06T14:18:57.385Z",
+      "highestScore": 86,
+      "timeSurvived": "0:20",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-06T14:18:57.385Z"
     }
   ]
 }
