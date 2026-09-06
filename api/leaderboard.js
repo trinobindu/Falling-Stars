@@ -1,4 +1,4 @@
-const { loadAllPlayers, sendJson, handleCors } = require('./_lib/storage');
+const { loadAllPlayers, sendJson, handleCors, parseTimeToSeconds } = require('./_lib/storage');
 
 module.exports = async function handler(req, res) {
   if (handleCors(req, res)) return;
@@ -14,7 +14,21 @@ module.exports = async function handler(req, res) {
         gamesPlayed: p.gamesPlayed || 0,
         signupDate: p.signupDate
       }))
-      .sort((a, b) => b.score - a.score);
+      .sort((a, b) => {
+        const scoreDiff = (b.score || 0) - (a.score || 0);
+        if (scoreDiff !== 0) return scoreDiff;
+
+        // Break ties with longer survival time
+        const timeA = parseTimeToSeconds(a.time);
+        const timeB = parseTimeToSeconds(b.time);
+        const timeDiff = timeB - timeA;
+        if (timeDiff !== 0) return timeDiff;
+
+        // Break ties with earlier signup date
+        const dateA = new Date(a.signupDate || 0).getTime();
+        const dateB = new Date(b.signupDate || 0).getTime();
+        return dateA - dateB;
+      });
 
     return sendJson(res, 200, {
       totalRegistered: players.length,

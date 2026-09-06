@@ -11,6 +11,17 @@ const VERCEL_URL = 'https://falling-stars-mu.vercel.app/api/sync?t=' + Date.now(
 const dataDir = path.join(__dirname, 'data');
 const playersDir = path.join(dataDir, 'players');
 
+function parseTimeToSeconds(timeStr) {
+  if (!timeStr || typeof timeStr !== 'string') return 0;
+  const parts = timeStr.trim().split(':');
+  if (parts.length === 2) {
+    const mins = parseInt(parts[0], 10) || 0;
+    const secs = parseInt(parts[1], 10) || 0;
+    return mins * 60 + secs;
+  }
+  return parseInt(timeStr, 10) || 0;
+}
+
 function saveLocally(players) {
   if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
   if (!fs.existsSync(playersDir)) fs.mkdirSync(playersDir, { recursive: true });
@@ -41,9 +52,17 @@ function saveLocally(players) {
   console.log('🏆 Real Players Global Leaderboard:');
   players
     .slice()
-    .sort((a, b) => (b.highestScore || 0) - (a.highestScore || 0))
+    .sort((a, b) => {
+      const scoreDiff = (b.highestScore || 0) - (a.highestScore || 0);
+      if (scoreDiff !== 0) return scoreDiff;
+      const timeA = parseTimeToSeconds(a.timeSurvived);
+      const timeB = parseTimeToSeconds(b.timeSurvived);
+      const timeDiff = timeB - timeA;
+      if (timeDiff !== 0) return timeDiff;
+      return new Date(a.signupDate || 0).getTime() - new Date(b.signupDate || 0).getTime();
+    })
     .forEach((p, idx) => {
-      console.log(`   #${idx + 1} ${p.ign} (${p.email}) - High Score: ${p.highestScore || 0} pts (${p.gamesPlayed || 0} games played)`);
+      console.log(`   #${idx + 1} ${p.ign} (${p.email}) - High Score: ${p.highestScore || 0} pts (Time: ${p.timeSurvived || '0:00'}, ${p.gamesPlayed || 0} games)`);
     });
   console.log('\n📁 Player files stored at:');
   console.log('   ' + playersDir);

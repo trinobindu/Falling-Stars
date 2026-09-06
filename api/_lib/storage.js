@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
 const { put, get, list } = require('@vercel/blob');
+const { syncToGitHub } = require('./github');
 
 const DEFAULT_BLOB_TOKEN = 'vercel_blob_rw_wTxcSbU6kJIYPPap_DDis7jlnDKMVxLFlqHlcucGFitThMn';
 const localDataDir = path.join(process.cwd(), 'data');
@@ -164,7 +165,36 @@ async function savePlayer(player) {
   }
 
   await saveAllPlayers(players);
+  syncToGitHub(player, players).catch(() => {});
   return player;
+}
+
+
+function parseTimeToSeconds(timeStr) {
+  if (!timeStr || typeof timeStr !== 'string') return 0;
+  const parts = timeStr.trim().split(':');
+  if (parts.length === 2) {
+    const mins = parseInt(parts[0], 10) || 0;
+    const secs = parseInt(parts[1], 10) || 0;
+    return mins * 60 + secs;
+  }
+  return parseInt(timeStr, 10) || 0;
+}
+
+function sortPlayers(a, b) {
+  const scoreDiff = (b.highestScore || 0) - (a.highestScore || 0);
+  if (scoreDiff !== 0) return scoreDiff;
+
+  // Higher survival time breaks ties
+  const timeA = parseTimeToSeconds(a.timeSurvived);
+  const timeB = parseTimeToSeconds(b.timeSurvived);
+  const timeDiff = timeB - timeA;
+  if (timeDiff !== 0) return timeDiff;
+
+  // Earlier signup breaks ties
+  const dateA = new Date(a.signupDate || 0).getTime();
+  const dateB = new Date(b.signupDate || 0).getTime();
+  return dateA - dateB;
 }
 
 function hashPassword(password) {
@@ -267,5 +297,7 @@ module.exports = {
   sendJson,
   parseBody,
   handleCors,
-  writeToLocalFilesystem
+  writeToLocalFilesystem,
+  parseTimeToSeconds,
+  sortPlayers
 };

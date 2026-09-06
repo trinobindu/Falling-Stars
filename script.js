@@ -778,18 +778,19 @@
 
   // Load high score for the active user profile
   function loadHighScore() {
+    let score = 0;
     if (state.currentUser && typeof state.currentUser.highestScore === 'number' && state.currentUser.highestScore > 0) {
-      state.highScore = state.currentUser.highestScore;
-    } else {
-      try {
-        const key = getHighScoreKey();
-        const saved = localStorage.getItem(key);
-        const val = parseInt(saved, 10);
-        state.highScore = !isNaN(val) && val >= 0 ? val : 0;
-      } catch (e) {
-        state.highScore = 0;
-      }
+      score = state.currentUser.highestScore;
     }
+    try {
+      const key = getHighScoreKey();
+      const saved = localStorage.getItem(key);
+      const val = parseInt(saved, 10);
+      if (!isNaN(val) && val > score) {
+        score = val;
+      }
+    } catch (e) {}
+    state.highScore = score;
     DOM.bestDisplay.textContent = state.highScore;
   }
 
@@ -828,12 +829,25 @@
     if (DOM.leaderboardEmpty) DOM.leaderboardEmpty.classList.add('hidden');
     if (DOM.leaderboardTableContainer) DOM.leaderboardTableContainer.classList.remove('hidden');
 
-    // Render Podium dynamically for up to 3 players
+    // Sync current player's score from cloud leaderboard
+    if (state.currentUser && state.currentUser.email) {
+      const myEmail = state.currentUser.email.toLowerCase();
+      const myEntry = board.find(p => p.email && p.email.toLowerCase() === myEmail);
+      if (myEntry && typeof myEntry.score === 'number' && myEntry.score > state.highScore) {
+        state.highScore = myEntry.score;
+        saveHighScore(state.highScore);
+        if (DOM.bestDisplay) DOM.bestDisplay.textContent = state.highScore;
+        if (DOM.readyBest) DOM.readyBest.textContent = state.highScore;
+      }
+    }
+
+    // Render Podium dynamically for top 3 active scorers
     if (DOM.leaderboardPodium) {
-      const podiumCount = Math.min(3, board.length);
+      const scorers = board.filter(item => (item.score || 0) > 0);
+      const podiumCount = Math.min(3, scorers.length);
       let podiumHtml = '';
       for (let i = 0; i < podiumCount; i++) {
-        const item = board[i];
+        const item = scorers[i];
         podiumHtml += `
           <div class="podium-card rank-${i + 1}">
             <span class="podium-medal">${medals[i]}</span>
@@ -963,6 +977,11 @@
       user.ign = user.name || user.email.split('@')[0];
     }
     user.ign = user.ign.trim();
+
+    if (user && typeof user.highestScore === 'number' && user.highestScore > (state.highScore || 0)) {
+      state.highScore = user.highestScore;
+      saveHighScore(state.highScore);
+    }
 
     state.currentUser = user;
     try {
@@ -1350,9 +1369,24 @@
     if (state.currentUser) {
       const timeStr = formatTime(state.elapsedSeconds);
       const res = await API.recordScore(state.currentUser.email, state.score, timeStr, state.currentUser.ign);
-      if (res && res.rank) {
-        if (DOM.finalRank) DOM.finalRank.textContent = `#${res.rank}`;
-        if (DOM.readyRank) DOM.readyRank.textContent = `#${res.rank}`;
+      if (res) {
+        if (typeof res.highestScore === 'number' && res.highestScore > 0) {
+          if (res.highestScore > state.highScore) {
+            state.highScore = res.highestScore;
+            saveHighScore(state.highScore);
+            DOM.bestDisplay.textContent = state.highScore;
+          }
+          DOM.finalBest.textContent = state.highScore;
+          if (DOM.readyBest) DOM.readyBest.textContent = state.highScore;
+        }
+        if (res.rank) {
+          if (DOM.finalRank) DOM.finalRank.textContent = `#${res.rank}`;
+          if (DOM.readyRank) DOM.readyRank.textContent = `#${res.rank}`;
+        }
+        if (typeof res.isNewHigh === 'boolean') {
+          soundEngine.gameOver(res.isNewHigh);
+          DOM.gameoverBadge.textContent = res.isNewHigh ? '🏆' : '💥';
+        }
       } else {
         const localRank = await getPlayerRank();
         if (DOM.finalRank) DOM.finalRank.textContent = typeof localRank === 'number' ? `#${localRank}` : localRank;

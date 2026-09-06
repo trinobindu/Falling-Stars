@@ -1,4 +1,4 @@
-const { getPlayerByEmail, loadAllPlayers, savePlayer, sendJson, parseBody, handleCors } = require('./_lib/storage');
+const { getPlayerByEmail, loadAllPlayers, savePlayer, sendJson, parseBody, handleCors, parseTimeToSeconds, sortPlayers } = require('./_lib/storage');
 
 module.exports = async function handler(req, res) {
   if (handleCors(req, res)) return;
@@ -48,15 +48,23 @@ module.exports = async function handler(req, res) {
     }
 
     let isNewHigh = false;
-    if (score > (player.highestScore || 0)) {
+    const currentHigh = player.highestScore || 0;
+    if (score > currentHigh) {
       player.highestScore = score;
       player.timeSurvived = timeSurvived;
       isNewHigh = true;
+    } else if (score === currentHigh && currentHigh > 0) {
+      // If same score achieved with better survival time, update timeSurvived
+      const oldSecs = parseTimeToSeconds(player.timeSurvived);
+      const newSecs = parseTimeToSeconds(timeSurvived);
+      if (newSecs > oldSecs) {
+        player.timeSurvived = timeSurvived;
+      }
     }
 
     await savePlayer(player);
 
-    const all = (await loadAllPlayers()).sort((a, b) => (b.highestScore || 0) - (a.highestScore || 0));
+    const all = (await loadAllPlayers()).sort(sortPlayers);
     const rankIndex = all.findIndex((p) => p.email && p.email.toLowerCase() === email);
     const rank = rankIndex >= 0 ? rankIndex + 1 : '-';
 
