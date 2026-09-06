@@ -1,6 +1,6 @@
 {
   "totalSignups": 31,
-  "lastUpdated": "2026-09-06T14:47:26.231Z",
+  "lastUpdated": "2026-09-06T14:47:32.424Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -81,6 +81,16 @@
       "timeSurvived": "0:31",
       "gamesPlayed": 15,
       "lastLogin": "2026-09-05T18:52:43.668Z"
+    },
+    {
+      "id": "usr_1788706046345_lpfhr",
+      "email": "krishsin29@gmail.com",
+      "ign": "Seenu2",
+      "signupDate": "2026-09-06T14:47:26.345Z",
+      "highestScore": 76,
+      "timeSurvived": "0:25",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-06T14:47:26.345Z"
     },
     {
       "id": "usr_1788705954932_smwaz",
@@ -213,16 +223,6 @@
       "lastLogin": "2026-09-05T18:31:06.670Z"
     },
     {
-      "id": "usr_1788631886468_b6hvb",
-      "email": "tdas47716@gmail.com",
-      "ign": "tdas47716@gmail.",
-      "signupDate": "2026-09-05T18:11:26.468Z",
-      "highestScore": 38,
-      "timeSurvived": "0:23",
-      "gamesPlayed": 1,
-      "lastLogin": "2026-09-05T18:11:26.468Z"
-    },
-    {
       "id": "usr_1788659287115_sej2s",
       "email": "souradeepdas888@gmail.com",
       "ign": "TrinobinduPungta",
@@ -231,6 +231,16 @@
       "timeSurvived": "0:18",
       "gamesPlayed": 2,
       "lastLogin": "2026-09-06T14:47:10.518Z"
+    },
+    {
+      "id": "usr_1788631886468_b6hvb",
+      "email": "tdas47716@gmail.com",
+      "ign": "tdas47716@gmail.",
+      "signupDate": "2026-09-05T18:11:26.468Z",
+      "highestScore": 38,
+      "timeSurvived": "0:23",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-05T18:11:26.468Z"
     },
     {
       "id": "usr_1788682938830_imdjl",
@@ -301,16 +311,6 @@
       "timeSurvived": "0:00",
       "gamesPlayed": 0,
       "lastLogin": "2026-09-06T10:09:04.163Z"
-    },
-    {
-      "id": "usr_1788706036852_e834u",
-      "email": "dibyarupdebnath7@gmail.com",
-      "ign": "dibyarupdebnath7",
-      "signupDate": "2026-09-06T14:47:16.852Z",
-      "highestScore": 0,
-      "timeSurvived": "0:00",
-      "gamesPlayed": 0,
-      "lastLogin": "2026-09-06T14:47:16.852Z"
     }
   ]
 }
