@@ -1,7 +1,18 @@
 {
   "totalSignups": 39,
-  "lastUpdated": "2026-09-07T11:01:56.557Z",
+  "lastUpdated": "2026-09-07T11:04:55.183Z",
   "players": [
+    {
+      "id": "usr_1788704419898_6hoqs",
+      "email": "krishansinha276@gmail.com",
+      "ign": "Seenu",
+      "signupDate": "2026-09-06T14:20:19.898Z",
+      "highestScore": 587,
+      "timeSurvived": "2:41",
+      "gamesPlayed": 3,
+      "lastLogin": "2026-09-07T11:04:40.928Z",
+      "lastActive": "2026-09-07T11:04:40.928Z"
+    },
     {
       "id": "usr_1788704453795_qj5v5",
       "email": "surjyadebnath03@gmail.com",
@@ -23,17 +34,6 @@
       "gamesPlayed": 24,
       "lastLogin": "2026-09-06T19:02:25.483Z",
       "lastActive": "2026-09-06T19:02:25.483Z"
-    },
-    {
-      "id": "usr_1788704419898_6hoqs",
-      "email": "krishansinha276@gmail.com",
-      "ign": "Seenu",
-      "signupDate": "2026-09-06T14:20:19.898Z",
-      "highestScore": 165,
-      "timeSurvived": "0:55",
-      "gamesPlayed": 3,
-      "lastLogin": "2026-09-07T10:59:50.463Z",
-      "lastActive": "2026-09-07T10:59:50.463Z"
     },
     {
       "id": "usr_1788618599477_di185",
