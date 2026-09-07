@@ -1,6 +1,6 @@
 {
   "totalSignups": 39,
-  "lastUpdated": "2026-09-07T03:53:53.148Z",
+  "lastUpdated": "2026-09-07T03:54:23.372Z",
   "players": [
     {
       "id": "usr_1788704453795_qj5v5",
@@ -234,6 +234,17 @@
       "lastActive": "2026-09-06T17:39:00.249Z"
     },
     {
+      "id": "usr_1788659287115_sej2s",
+      "email": "souradeepdas888@gmail.com",
+      "ign": "TrinobinduPungta",
+      "signupDate": "2026-09-06T01:48:07.115Z",
+      "highestScore": 49,
+      "timeSurvived": "0:25",
+      "gamesPlayed": 3,
+      "lastLogin": "2026-09-07T03:53:53.039Z",
+      "lastActive": "2026-09-07T03:53:53.039Z"
+    },
+    {
       "id": "usr_1788633566964_bgxpa",
       "email": "example@gmail.com",
       "ign": "exampleUser",
@@ -313,17 +324,6 @@
       "timeSurvived": "0:21",
       "gamesPlayed": 1,
       "lastLogin": "2026-09-05T18:31:06.670Z"
-    },
-    {
-      "id": "usr_1788659287115_sej2s",
-      "email": "souradeepdas888@gmail.com",
-      "ign": "TrinobinduPungta",
-      "signupDate": "2026-09-06T01:48:07.115Z",
-      "highestScore": 41,
-      "timeSurvived": "0:20",
-      "gamesPlayed": 3,
-      "lastLogin": "2026-09-07T03:53:23.500Z",
-      "lastActive": "2026-09-07T03:53:23.500Z"
     },
     {
       "id": "usr_1788683198169_oesj2",
