@@ -1,6 +1,6 @@
 {
   "totalSignups": 39,
-  "lastUpdated": "2026-09-07T12:03:24.956Z",
+  "lastUpdated": "2026-09-07T12:37:43.503Z",
   "players": [
     {
       "id": "usr_1788704419898_6hoqs",
@@ -293,9 +293,10 @@
       "ign": "namamahesh643@gm",
       "signupDate": "2026-09-06T14:36:25.517Z",
       "highestScore": 44,
-      "timeSurvived": "0:19",
-      "gamesPlayed": 2,
-      "lastLogin": "2026-09-06T14:39:25.856Z"
+      "timeSurvived": "0:20",
+      "gamesPlayed": 3,
+      "lastLogin": "2026-09-07T12:34:11.195Z",
+      "lastActive": "2026-09-07T12:34:11.197Z"
     },
     {
       "id": "usr_1788616918113_13k4n",
