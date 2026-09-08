@@ -5,8 +5,9 @@
   "salt": "8b68c6a50d41cfaa011e338a79bd4af2",
   "hash": "a4b66665d0878271badf7d34d5a5adc711e0919e027c6611883f9391f751f2a2915894ea3f692178e41f7e26ef59fc565dce1135866616dc29b91afbf5a190ea",
   "signupDate": "2026-09-08T16:03:29.614Z",
-  "lastLogin": "2026-09-08T16:03:29.614Z",
-  "highestScore": 0,
-  "timeSurvived": "0:00",
-  "gamesPlayed": 0
+  "lastLogin": "2026-09-08T16:03:53.787Z",
+  "highestScore": 26,
+  "timeSurvived": "0:17",
+  "gamesPlayed": 1,
+  "lastActive": "2026-09-08T16:03:53.787Z"
 }
