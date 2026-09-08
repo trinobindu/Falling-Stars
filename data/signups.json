@@ -1,6 +1,6 @@
 {
-  "totalSignups": 39,
-  "lastUpdated": "2026-09-08T11:12:44.614Z",
+  "totalSignups": 40,
+  "lastUpdated": "2026-09-08T16:03:53.773Z",
   "players": [
     {
       "id": "usr_1788704419898_6hoqs",
@@ -409,6 +409,16 @@
       "timeSurvived": "0:00",
       "gamesPlayed": 0,
       "lastLogin": "2026-09-06T10:09:04.163Z"
+    },
+    {
+      "id": "usr_1788883409614_tvjwm",
+      "email": "demon@gmail.com",
+      "ign": "Demon",
+      "signupDate": "2026-09-08T16:03:29.614Z",
+      "highestScore": 0,
+      "timeSurvived": "0:00",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-08T16:03:29.614Z"
     }
   ]
 }
