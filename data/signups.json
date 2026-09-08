@@ -1,6 +1,6 @@
 {
   "totalSignups": 40,
-  "lastUpdated": "2026-09-08T16:03:53.773Z",
+  "lastUpdated": "2026-09-08T16:04:15.392Z",
   "players": [
     {
       "id": "usr_1788704419898_6hoqs",
@@ -370,6 +370,17 @@
       "lastLogin": "2026-09-05T17:36:36.352Z"
     },
     {
+      "id": "usr_1788883409614_tvjwm",
+      "email": "demon@gmail.com",
+      "ign": "Demon",
+      "signupDate": "2026-09-08T16:03:29.614Z",
+      "highestScore": 26,
+      "timeSurvived": "0:17",
+      "gamesPlayed": 1,
+      "lastLogin": "2026-09-08T16:03:53.787Z",
+      "lastActive": "2026-09-08T16:03:53.787Z"
+    },
+    {
       "id": "usr_1788708865719_q446n",
       "email": "rnag24388@gmail.com",
       "ign": "ice",
@@ -409,16 +420,6 @@
       "timeSurvived": "0:00",
       "gamesPlayed": 0,
       "lastLogin": "2026-09-06T10:09:04.163Z"
-    },
-    {
-      "id": "usr_1788883409614_tvjwm",
-      "email": "demon@gmail.com",
-      "ign": "Demon",
-      "signupDate": "2026-09-08T16:03:29.614Z",
-      "highestScore": 0,
-      "timeSurvived": "0:00",
-      "gamesPlayed": 1,
-      "lastLogin": "2026-09-08T16:03:29.614Z"
     }
   ]
 }
